@@ -2,8 +2,8 @@ import axios from 'axios';
 import { authService } from './authService';
 
 // Get API base URL from environment variables or use default
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://www.ibpsys.com.br/watchsr';
-const API_BASE_URL = 'https://localhost:7132';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://www.ibpsys.com.br/watchsr';
+//const API_BASE_URL = 'https://localhost:7132';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
