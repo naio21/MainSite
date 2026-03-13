@@ -7,7 +7,7 @@
         </router-link>
         <div class="nav-links">
           <router-link to="/">Home</router-link>
-          <router-link to="/auth">Watch SR</router-link>
+          <router-link to="/watchsr">Watch SR</router-link>
         </div>
       </div>
     </nav>

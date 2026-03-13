@@ -250,9 +250,10 @@ export default {
                 text: 'Login realizado com sucesso!',
                 type: 'success'
               };
-              // Redirect to home after 2 seconds
+              // Redirect to the originally requested page or home after 2 seconds
               setTimeout(() => {
-                this.$router.push('/');
+                const redirectTo = this.$route.query.redirect || '/';
+                this.$router.push(redirectTo);
               }, 2000);
             }
           })
@@ -312,9 +313,10 @@ export default {
           };
           // Reset form
           this.resetSignUpForm();
-          // Redirect to home after 2 seconds
+          // Redirect to the originally requested page or home after 2 seconds
           setTimeout(() => {
-            this.$router.push('/');
+            const redirectTo = this.$route.query.redirect || '/';
+            this.$router.push(redirectTo);
           }, 2000);
         }
       } catch (error) {

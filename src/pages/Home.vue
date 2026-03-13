@@ -26,7 +26,7 @@
             <p>
               Uma aplição voltada para o gerenciamento de Ordens de Serviço para Relojoeiros, ajudando-os a organizar, otimizar e priorizar as demandas de seus clientes.
             </p>
-            <router-link to="/auth" class="product-link">Saiba Mais</router-link>
+            <router-link to="/watchsr" class="product-link">Saiba Mais</router-link>
           </div>
         </div>
       </div>
