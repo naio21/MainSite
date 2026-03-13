@@ -40,7 +40,7 @@
             <label for="signin-password">Senha:</label>
             <input 
               id="signin-password"
-              v-model="signInForm.password" 
+              v-model="signInForm.senha" 
               type="password" 
               required
               placeholder="Digite sua senha"
@@ -184,7 +184,7 @@ export default {
       isSubmitting: false,
       signInForm: {
         email: '',
-        password: ''
+        senha: ''
       },
       forgotForm: {
         email: ''
@@ -242,25 +242,36 @@ export default {
     },
     handleSignIn() {
       try {
-        authService.login(this.signInForm.email, this.signInForm.password)
+        authService.login(this.signInForm.email, this.signInForm.senha)
           .then(response => {
-            if (response.data.token) {
-              authService.setToken(response.data.token);
+            // API returns token in response.data.dados (lowercase)
+            const token = response.data?.dados;
+            
+            if (token) {
+              authService.setToken(token);
               this.signInMessage = {
                 text: 'Login realizado com sucesso!',
                 type: 'success'
               };
               // Redirect to the originally requested page or home after 2 seconds
               setTimeout(() => {
-                const redirectTo = this.$route.query.redirect || '/';
+                const redirectPath = sessionStorage.getItem('redirectPath');
+                sessionStorage.removeItem('redirectPath');
+                const redirectTo = redirectPath || '/';
                 this.$router.push(redirectTo);
               }, 2000);
+            } else {
+              console.warn('No token found in response:', response.data);
+              this.signInMessage = {
+                text: 'Resposta do servidor inválida. Tente novamente.',
+                type: 'error'
+              };
             }
           })
           .catch(error => {
             console.error('Login error:', error);
             this.signInMessage = {
-              text: error.response?.data?.message || 'E-mail ou senha inválidos.',
+              text: error.response?.data?.mensagem || 'E-mail ou senha inválidos.',
               type: 'error'
             };
           });
@@ -315,7 +326,9 @@ export default {
           this.resetSignUpForm();
           // Redirect to the originally requested page or home after 2 seconds
           setTimeout(() => {
-            const redirectTo = this.$route.query.redirect || '/';
+            const redirectPath = sessionStorage.getItem('redirectPath');
+            sessionStorage.removeItem('redirectPath');
+            const redirectTo = redirectPath || '/';
             this.$router.push(redirectTo);
           }, 2000);
         }

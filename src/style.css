@@ -136,6 +136,88 @@ nav a:hover {
   color: #667eea;
 }
 
+.logout-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+}
+
+/* ===== Token Expiry Warning ===== */
+.expiry-warning {
+  background-color: #fff3cd;
+  border-bottom: 2px solid #ffc107;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  animation: slideDown 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.warning-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warning-text {
+  color: #856404;
+  font-weight: 500;
+  flex-grow: 1;
+}
+
+.warning-link {
+  color: #0c5460;
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.warning-link:hover {
+  color: #062c33;
+  text-decoration: none;
+}
+
+.warning-close {
+  background: none;
+  border: none;
+  color: #856404;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.warning-close:hover {
+  color: #662c0b;
+}
+
 /* ===== HelloWorld.vue Styles ===== */
 .read-the-docs {
   color: #888;

@@ -38,10 +38,9 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth && !isAuthenticated) {
     // Redirect to Auth page if route requires authentication and user is not authenticated
-    next({ 
-      name: 'Auth',
-      query: { redirect: to.fullPath }
-    })
+    // Store the redirect path in sessionStorage to avoid issues with query parameters
+    sessionStorage.setItem('redirectPath', to.fullPath)
+    next({ name: 'Auth' })
   } else {
     next()
   }
