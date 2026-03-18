@@ -84,9 +84,10 @@
               id="signup-nome"
               v-model="signUpForm.nome" 
               type="text" 
-              required
               placeholder="Digite seu nome completo"
+              @blur="validateNome"
             >
+            <p class="error-message" v-if="nomeError">{{ nomeError }}</p>
           </div>
 
           <div class="form-group">
@@ -95,9 +96,9 @@
               id="signup-documento"
               v-model="signUpForm.documento" 
               type="text" 
-              required
               placeholder="000.000.000-00 ou 00.000.000/0000-00"
               maxlength="18"
+              @input="maskDocumento"
               @blur="validateDocumento"
             >
             <p class="error-message" v-if="documentoError">{{ documentoError }}</p>
@@ -109,11 +110,12 @@
               id="signup-telefone"
               v-model="signUpForm.telefone" 
               type="tel" 
-              required
               placeholder="(11) 98765-4321"
               maxlength="15"
               @input="maskPhoneNumber"
+              @blur="validateTelefone"
             >
+            <p class="error-message" v-if="telefoneError">{{ telefoneError }}</p>
           </div>
 
           <div class="form-group">
@@ -122,9 +124,10 @@
               id="signup-razao"
               v-model="signUpForm.razaoSocial" 
               type="text" 
-              required
               placeholder="Razão Social da sua empresa"
+              @blur="validateRazaoSocial"
             >
+            <p class="error-message" v-if="razaoSocialError">{{ razaoSocialError }}</p>
           </div>
 
           <div class="form-group">
@@ -133,7 +136,6 @@
               id="signup-fantasia"
               v-model="signUpForm.nomeFantasia" 
               type="text" 
-              required
               placeholder="Nome Fantasia da sua empresa"
             >
           </div>
@@ -144,9 +146,10 @@
               id="signup-email"
               v-model="signUpForm.email" 
               type="email" 
-              required
               placeholder="seu.email@example.com"
+              @blur="validateEmail"
             >
+            <p class="error-message" v-if="emailError">{{ emailError }}</p>
           </div>
 
           <div class="form-group">
@@ -155,9 +158,10 @@
               id="signup-senha"
               v-model="signUpForm.senha" 
               type="password" 
-              required
               placeholder="Crie uma senha segura"
+              @blur="validateSenha"
             >
+            <p class="error-message" v-if="senhaError">{{ senhaError }}</p>
           </div>
 
           <button type="submit" class="submit-button" :disabled="isSubmitting">
@@ -210,17 +214,33 @@ export default {
         text: '',
         type: ''
       },
+      nomeError: '',
+      telefoneError: '',
+      razaoSocialError: '',
+      emailError: '',
+      senhaError: '',
       documentoError: ''
     }
   },
   methods: {
+    maskDocumento(event) {
+      let value = event.target.value.replace(/\D/g, '');
+      let masked = '';
+
+      if (value.length === 11) {
+        // CPF format: XXX.XXX.XXX-XX
+        masked = value.slice(0, 3) + '.' + value.slice(3, 6) + '.' + value.slice(6, 9) + '-' + value.slice(9);
+      } else if (value.length === 14) {
+        // CNPJ format: XX.XXX.XXX/XXXX-XX
+        masked = value.slice(0, 2) + '.' + value.slice(2, 5) + '.' + value.slice(5, 8) + '/' + value.slice(8, 12) + '-' + value.slice(12);
+      } else {
+        masked = value;
+      }
+
+      this.signUpForm.documento = masked;
+    },
     validateDocumento() {
       const documento = this.signUpForm.documento.replace(/\D/g, '');
-      
-      if (!documento) {
-        this.documentoError = 'Documento é obrigatório.';
-        return false;
-      }
       
       if (documento.length === 11) {
         if (!isCPF(documento)) {
@@ -238,6 +258,87 @@ export default {
       }
       
       this.documentoError = '';
+      return true;
+    },
+    validateNome() {
+      const nome = this.signUpForm.nome.trim();
+      
+      if (!nome) {
+        this.nomeError = 'Nome é obrigatório.';
+        return false;
+      }
+      
+      if (nome.length < 3) {
+        this.nomeError = 'Nome deve ter no mínimo 3 caracteres.';
+        return false;
+      }
+      
+      this.nomeError = '';
+      return true;
+    },
+    validateTelefone() {
+      const telefone = this.signUpForm.telefone.replace(/\D/g, '');
+      
+      if (!telefone) {
+        this.telefoneError = 'Telefone é obrigatório.';
+        return false;
+      }
+      
+      if (telefone.length < 10 || telefone.length > 11) {
+        this.telefoneError = 'Telefone deve ter 10 ou 11 dígitos.';
+        return false;
+      }
+      
+      this.telefoneError = '';
+      return true;
+    },
+    validateRazaoSocial() {
+      const razaoSocial = this.signUpForm.razaoSocial.trim();
+      
+      if (!razaoSocial) {
+        this.razaoSocialError = 'Razão Social é obrigatória.';
+        return false;
+      }
+      
+      if (razaoSocial.length < 3) {
+        this.razaoSocialError = 'Razão Social deve ter no mínimo 3 caracteres.';
+        return false;
+      }
+      
+      this.razaoSocialError = '';
+      return true;
+    },
+    validateEmail() {
+      const email = this.signUpForm.email.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (!email) {
+        this.emailError = 'E-mail é obrigatório.';
+        return false;
+      }
+      
+      if (!emailRegex.test(email)) {
+        this.emailError = 'E-mail inválido.';
+        return false;
+      }
+      
+      this.emailError = '';
+      return true;
+    },
+    validateSenha() {
+      const senha = this.signUpForm.senha;
+      
+      if (!senha) {
+        this.senhaError = 'Senha é obrigatória.';
+        return false;
+      }
+      
+      if (senha.length < 6) {
+        this.senhaError = 'Senha deve ter no mínimo 6 caracteres.';
+        return false;
+      }
+      
+      this.senhaError = '';
       return true;
     },
     handleSignIn() {
@@ -298,14 +399,20 @@ export default {
       }, 3000);
     },
     async handleSignUp() {
-      if (!this.validateDocumento()) {
+      // Validate all fields
+      if (!this.validateNome() || 
+          !this.validateDocumento() || 
+          !this.validateTelefone() || 
+          !this.validateRazaoSocial() || 
+          !this.validateEmail() || 
+          !this.validateSenha()) {
         return;
       }
 
       this.isSubmitting = true;
       try {
-        // Map form data to API schema
-        const clientData = {
+        // Map form data to RegisterModel structure
+        const signUpData = {
           nome: this.signUpForm.nome,
           documento: this.signUpForm.documento.replace(/\D/g, ''),
           telefone: this.signUpForm.telefone,
@@ -315,27 +422,32 @@ export default {
           senha: this.signUpForm.senha
         };
 
-        const response = await authService.signup(clientData);
+        const response = await authService.signup(signUpData);
 
-        if (response.status === 200 || response.status === 201) {
+        // Check if registration was successful
+        if (response.data?.status === true) {
           this.signUpMessage = {
-            text: 'Conta criada com sucesso! Redirecionando...',
+            text: 'Conta criada com sucesso! Verifique seu e-mail para ativar a conta. Redirecionando...',
             type: 'success'
           };
           // Reset form
           this.resetSignUpForm();
-          // Redirect to the originally requested page or home after 2 seconds
+          // Redirect to the login tab or home after 3 seconds
           setTimeout(() => {
-            const redirectPath = sessionStorage.getItem('redirectPath');
-            sessionStorage.removeItem('redirectPath');
-            const redirectTo = redirectPath || '/';
-            this.$router.push(redirectTo);
-          }, 2000);
+            this.activeTab = 'signin';
+            this.signUpMessage = { text: '', type: '' };
+          }, 3000);
+        } else {
+          this.signUpMessage = {
+            text: response.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.',
+            type: 'error'
+          };
         }
       } catch (error) {
         console.error('Signup error:', error);
+        const errorMessage = error.response?.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.';
         this.signUpMessage = {
-          text: error.response?.data?.message || 'Erro ao criar a conta. Por favor, tente novamente.',
+          text: errorMessage,
           type: 'error'
         };
       } finally {
@@ -367,6 +479,13 @@ export default {
         email: '',
         senha: ''
       };
+      // Clear all error messages
+      this.nomeError = '';
+      this.documentoError = '';
+      this.telefoneError = '';
+      this.razaoSocialError = '';
+      this.emailError = '';
+      this.senhaError = '';
     }
   }
 }

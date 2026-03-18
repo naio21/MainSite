@@ -12,8 +12,22 @@ export const authService = {
     });
   },
 
-  signup(clientData) {
-    return apiClient.post('/api/Clientes', clientData);
+  signup(formData) {
+    // Map form data to RegisterModel structure expected by the backend
+    const registerModel = {
+      empresa: {
+        documento: formData.documento.replace(/\D/g, ''),
+        razaoSocial: formData.razaoSocial,
+        nomeFantasia: formData.nomeFantasia
+      },
+      usuario: {
+        nome: formData.nome,
+        email: formData.email,
+        telefone: formData.telefone.replace(/\D/g, ''),
+        senha: formData.senha
+      }
+    };
+    return apiClient.post('/api/Authentication/register', registerModel);
   },
 
   logout() {

@@ -3,7 +3,7 @@
 # Usage: .\deploy.ps1
 
 param(
-    [string]$OutputPath = "C:\Deployments",
+    [string]$OutputPath = "C:\Ivan\Empresas\MEI\Site\_publish",
     [switch]$SkipBuild = $false
 )
 
