@@ -1,134 +1,139 @@
-# WatchSR Application - Deployment Documentation
+# Aplicação WatchSR - Documentação de Implantação
 
-📦 **Self-contained static web application** - No runtime dependencies required on production server.
+📦 **Aplicação web estática e autossuficiente** - Sem dependências de tempo de execução necessárias no servidor de produção.
 
-## Quick Start
+## Início Rápido
 
-### For Developers (Building and Packaging)
+### Para Desenvolvedores (Compilação)
 
 ```bash
-# 1. Install dependencies
+# 1. Instalar dependências
 npm install
 
-# 2. Build for production
+# 2. Compilar para produção
 npm run build
-
-# 3. Create deployment package
-# Option A: PowerShell (automated)
-.\deploy.ps1
-
-# Option B: Manual zip creation
-# - Go to dist/ folder
-# - Select all files
-# - Right-click → Send to → Compressed (zipped) folder
 ```
 
-**Output:** `watchsr-deployment-YYYY-MM-DD-HHMMSS.zip` in `C:\Deployments\`
+**Saída:** Todos os arquivos são criados em `C:\Ivan\Empresas\MEI\Site\_publish\`
 
-### For IIS Administrators (Server Deployment)
+### Para Administradores IIS (Implantação no Servidor)
 
-1. **Prerequisites:**
-   - Windows Server with IIS 10
-   - URL Rewrite Module for IIS (required)
+1. **Pré-requisitos:**
+   - Windows Server com IIS 10
+   - Módulo URL Rewrite para IIS (necessário)
 
-2. **Deploy:**
-   - Extract `watchsr-deployment.zip` to `C:\inetpub\wwwroot\watchsr\`
-   - Create IIS website pointing to that folder
-   - Verify `web.config` is in the application folder
+2. **Implantar:**
+   - Envie todos os arquivos de `C:\Ivan\Empresas\MEI\Site\_publish\` para seu servidor web via FTP
+   - Certifique-se de que `web.config` está na pasta raiz
+   - Verifique se o site IIS aponta para a pasta correta
 
-3. **Test:** Navigate to your server URL in browser
-
----
-
-## Documentation Files
-
-| File | Purpose | For |
-|------|---------|-----|
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Complete step-by-step deployment process | Developers & DevOps |
-| [IIS_SETUP_GUIDE.md](IIS_SETUP_GUIDE.md) | IIS server configuration and troubleshooting | System Administrators |
-| [web.config](web.config) | IIS configuration for Vue Router SPA | Auto-deployed |
-| [deploy.ps1](deploy.ps1) | Automated build & packaging script | Developers |
+3. **Testar:** Navegue até a URL do seu servidor no navegador
 
 ---
 
-## What's Included
+## Arquivos de Documentação
 
-### Local Files (Development Machine)
-- `web.config` - IIS configuration for SPA routing
-- `DEPLOYMENT_GUIDE.md` - Complete deployment documentation
-- `IIS_SETUP_GUIDE.md` - Server administrator guide
-- `deploy.ps1` - PowerShell deployment script
-
-### Deployment Package (In zip file)
-- `index.html` - Main application entry point
-- `assets/` - Bundled JavaScript, CSS, and images
-- `web.config` - IIS routing configuration
+| Arquivo | Propósito | Para |
+|---------|-----------|------|
+| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Processo de implantação completo passo a passo | Desenvolvedores & DevOps |
+| [IIS_SETUP_GUIDE.md](IIS_SETUP_GUIDE.md) | Configuração e resolução de problemas do servidor IIS | Administradores de Sistema |
+| [web.config](web.config) | Configuração do IIS para Vue Router SPA | Implantado automaticamente |
 
 ---
 
-## Technology Stack
+## O que está Incluído
+
+### Arquivos Locais (Máquina de Desenvolvimento)
+- `web.config` - Configuração do IIS para roteamento SPA
+- `DEPLOYMENT_GUIDE.md` - Documentação completa de implantação
+- `IIS_SETUP_GUIDE.md` - Guia do administrador do servidor
+- `src/` - Código-fonte Vue.js
+- `vite.config.js` - Configuração de compilação Vite
+
+### Saída de Compilação (Na pasta _publish/)
+- `index.html` - Ponto de entrada principal da aplicação
+- `assets/` - JavaScript, CSS e imagens agrupados
+- `web.config` - Configuração de roteamento do IIS
+
+---
+
+## Pilha de Tecnologia
 
 - **Frontend:** Vue.js 3.5
-- **Build Tool:** Vite 7.3
-- **Routing:** Vue Router 4.3
-- **HTTP Client:** Axios 1.13
-- **Validation:** validation-br 1.6
-- **Server:** IIS 10 (Windows Server)
-- **Hosting:** Static files (no runtime needed)
+- **Ferramenta de Compilação:** Vite 7.3
+- **Roteamento:** Vue Router 4.3 com página de ativação
+- **Cliente HTTP:** Axios 1.13
+- **Servidor:** IIS 10 (Windows Server)
+- **Hospedagem:** Arquivos estáticos (sem tempo de execução necessário)
 
 ---
 
-## API Configuration
+## Configuração de API
 
-The application communicates with a .NET WebAPI at:
+A aplicação se comunica com uma API da Web .NET em:
 ```
-https://localhost:7132
+https://www.ibpsys.com.br/watchsr
 ```
 
-To change this:
-1. Edit `src/service/api.js`
-2. Change the `API_BASE_URL` constant
-3. Rebuild and redeploy
+Isso é configurado automaticamente. Para alterá-lo:
+1. Edite `src/service/api.js`
+2. Altere a constante `API_BASE_URL`
+3. Recompile: `npm run build`
+4. Reimplante arquivos da pasta `_publish/`
 
 ---
 
-## Key Features
+## Recurso-chave
 
-✅ **Authentication** - Login with email and password  
-✅ **Route Guards** - Automatic redirection to login page  
-✅ **Token Management** - 14-day token expiration with warnings  
-✅ **Logout** - Clear token and redirect to home  
-✅ **Token Expiry Warning** - Banner appears 24 hours before expiration  
-✅ **SPA Routing** - Vue Router with proper 404 handling  
-✅ **Responsive Design** - Works on all devices  
+✅ **Autenticação** - Login com email e senha  
+✅ **Registro de Usuário** - Inscrição com detalhes da empresa  
+✅ **Ativação de Conta** - Página de ativação via link de email  
+✅ **Proteção de Rotas** - Redirecionamento automático para a página de login  
+✅ **Gerenciamento de Token** - Expiração de token de 14 dias com avisos  
+✅ **Logout** - Limpar token e redirecionar para a página inicial  
+✅ **Aviso de Expiração de Token** - Banner aparece 24 horas antes da expiração  
+✅ **Roteamento SPA** - Vue Router com tratamento adequado de 404  
+✅ **Design Responsivo** - Funciona em todos os dispositivos  
 
 ---
 
-## Deployment Process Diagram
+## Novos Recursos
+
+### Página de Ativação de Conta
+Os usuários agora podem concluir a ativação da conta através do link de email:
+- Página de destino em `/activate`
+- Extrai automaticamente o ID de ativação da URL
+- Chama a API para ativar a conta
+- Mostra mensagem de sucesso ou erro
+
+Exemplo de link de ativação:
+```
+https://www.ibpsys.com.br/activate?id=hpX7WelBDCsMF/wQyHwpIw==
+```
+
+---
+
+## Processo de Implantação
 
 ```
-Local Development
+Desenvolvimento Local
     ↓
 npm install
     ↓
-npm run build (creates dist/ folder)
+npm run build (cria pasta _publish/)
     ↓
-./deploy.ps1 (creates zip file)
+Enviar arquivos via FTP para servidor web
     ↓
-Transfer zip to Windows Server
+Verificar se web.config está no lugar
     ↓
-Extract to C:\inetpub\wwwroot\watchsr\
+Acessar via navegador
     ↓
-Create IIS Website
-    ↓
-Access via browser (http://your-server)
-    ↓
-✅ Ready to use!
+✅ Pronto para usar!
 ```
 
 ---
 
-## File Structure
+## Estrutura de Arquivos
 
 ```
 c:\Ivan\Empresas\MEI\Site\www\
@@ -136,18 +141,75 @@ c:\Ivan\Empresas\MEI\Site\www\
 │   ├── App.vue
 │   ├── main.js
 │   ├── style.css
-│   ├── pages/
-│   │   ├── Auth.vue         (Login/Signup)
-│   │   ├── Home.vue         (Home page)
-│   │   └── WatchSR.vue      (Protected page)
+│   ├── assets/
+│   │   └── logo.png
 │   ├── components/
 │   │   └── HelloWorld.vue
-│   ├── service/
-│   │   ├── api.js           (Axios configuration)
-│   │   ├── authService.js   (Authentication logic)
-│   │   ├── clientesService.js
-│   │   └── serviceRequestsService.js
-│   └── assets/
+│   ├── pages/
+│   │   ├── Auth.vue         (Login/Signup)
+│   │   ├── Activate.vue     (Página de ativação)
+│   │   ├── Home.vue         (Página inicial)
+│   │   └── WatchSR.vue      (Página protegida)
+│   └── service/
+│       ├── api.js           (Configuração Axios)
+│       └── authService.js   (Lógica de autenticação)
+├── public/
+├── node_modules/
+├── vite.config.js
+├── web.config               (Configuração do IIS)
+├── DEPLOYMENT_GUIDE.md
+├── DEPLOYMENT_README.md     (este arquivo)
+├── IIS_SETUP_GUIDE.md
+└── [outros arquivos do projeto]
+```
+
+---
+
+## Estrutura de Saída de Compilação
+
+Após `npm run build`, a pasta `_publish/` contém:
+
+```
+_publish/
+├── index.html               (Ponto de entrada principal)
+├── web.config               (Regras de roteamento do IIS)
+├── favicon.svg
+├── vite.svg
+└── assets/
+    ├── index-*.js           (Bundle do aplicativo principal)
+    ├── index-*.css          (Bundle de estilos)
+    └── logo-*.png           (Ativos de imagem)
+```
+
+O `*` nos nomes de arquivo representa o hash do Vite para cache-busting.
+
+---
+
+## Lista de Verificação de Implantação
+
+- [ ] Executar `npm install` 
+- [ ] Executar `npm run build`
+- [ ] Verificar conteúdo da pasta `_publish/`
+- [ ] Enviar todos os arquivos de `_publish/` para servidor web via FTP
+- [ ] Garantir que `web.config` está na pasta raiz
+- [ ] Verificar se o servidor web tem o Módulo URL Rewrite instalado
+- [ ] Testar aplicação no navegador
+- [ ] Testar fluxo de autenticação
+- [ ] Testar link de ativação
+
+---
+
+## Suporte
+
+Para instruções detalhadas de implantação, consulte [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+
+Para configuração do servidor IIS, consulte [IIS_SETUP_GUIDE.md](IIS_SETUP_GUIDE.md)
+
+---
+
+**Última Atualização:** 20 de março de 2026
+**Aplicação:** Frontend Vue.js WatchSR
+**Saída de Compilação:** `C:\Ivan\Empresas\MEI\Site\_publish\`
 ├── dist/                    (Generated by build - don't commit)
 ├── public/
 ├── package.json

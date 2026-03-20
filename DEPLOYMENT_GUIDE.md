@@ -1,296 +1,241 @@
-# Vue.js Application Deployment Guide
+# Guia de Implantação da Aplicação Vue.js
 ## Windows Server + IIS 10
 
 ---
 
-## Overview
+## Visão Geral
 
-This guide documents the complete process for building and deploying this Vue.js application (with Vite) to a Windows Server running IIS 10. The deployment is a **static file package** with no runtime dependencies required on the server.
-
----
-
-## Prerequisites
-
-### Local Machine (Development)
-- Node.js 16+ installed
-- npm installed
-- Git (optional, for version control)
-
-### Remote Server (Windows Server with IIS 10)
-- IIS 10 installed and running
-- URL Rewrite Module installed (required for SPA routing)
-- Basic administrative access to IIS
+Este guia documenta o processo completo para construir e implantar esta aplicação Vue.js (com Vite) em um Windows Server executando IIS 10. A implantação é um **pacote de arquivo estático** sem dependências de tempo de execução necessárias no servidor.
 
 ---
 
-## Step 1: Build the Application Locally
+## Pré-requisitos
 
-### 1.1 Prepare the build
-On your local development machine:
+### Máquina Local (Desenvolvimento)
+- Node.js 16+ instalado
+- npm instalado
+- Git (opcional, para controle de versão)
+
+### Servidor Remoto (Windows Server com IIS 10)
+- IIS 10 instalado e em execução
+- Módulo URL Rewrite instalado (necessário para roteamento SPA)
+- Acesso administrativo básico ao IIS
+
+---
+
+## Etapa 1: Compilar a Aplicação Localmente
+
+### 1.1 Preparar a compilação
+Na sua máquina de desenvolvimento local:
 
 ```bash
-# Navigate to project directory
+# Navegue até o diretório do projeto
 cd C:\Ivan\Empresas\MEI\Site\www
 
-# Install dependencies
+# Instalar dependências
 npm install
 
-# Run development server to test (optional)
+# Execute o servidor de desenvolvimento para testar (opcional)
 npm run dev
 
-# When ready to build, run the build command
+# Quando pronto para compilar, execute o comando de compilação
 npm run build
 ```
 
-### 1.2 Build output
-After running `npm run build`, a `dist/` folder is created containing:
-- `index.html` - Main entry point
-- `assets/` - Bundled JavaScript, CSS, and images
-- All static files needed to run the application
+### 1.2 Saída da compilação
+Após executar `npm run build`, uma pasta `../_publish/` é criada (em `C:\Ivan\Empresas\MEI\Site\_publish\`) contendo:
+- `index.html` - Ponto de entrada principal
+- `assets/` - JavaScript agrupado, CSS e imagens
+- `web.config` - Configuração de roteamento do IIS
+- Todos os arquivos estáticos necessários para executar a aplicação
 
-**No additional files are needed!** Everything is self-contained.
+**Nenhum arquivo adicional é necessário!** Tudo é autossuficiente.
 
 ---
 
-## Step 2: Prepare the Deployment Package
+## Etapa 2: Preparar Arquivos para Implantação
 
-### 2.1 Create deployment archive
+Após a compilação, você tem todos os arquivos prontos em `C:\Ivan\Empresas\MEI\Site\_publish\`:
 
-After building, you have two options:
-
-**Option A: Using PowerShell (Automated)**
-```powershell
-# On your local machine, in the project root
-$distFolder = "C:\Ivan\Empresas\MEI\Site\www\dist"
-$outputZip = "C:\Ivan\Empresas\MEI\Site\www\watchsr-deployment.zip"
-
-# Create zip archive
-Compress-Archive -Path $distFolder\* -DestinationPath $outputZip -Force
-
-Write-Host "Deployment package created: $outputZip"
+### 2.1 Arquivos para enviar
+```
+_publish/
+├── index.html           ← Ponto de entrada principal
+├── web.config           ← Configuração do IIS (certifique-se de que está incluído)
+└── assets/
+    ├── index-*.js       ← JavaScript agrupado
+    ├── index-*.css      ← CSS agrupado
+    └── logo-*.png       ← Imagens
 ```
 
-**Option B: Manual**
-1. Open Windows Explorer
-2. Navigate to `C:\Ivan\Empresas\MEI\Site\www\dist\`
-3. Select all files and folders
-4. Right-click → Send to → Compressed (zipped) folder
-5. Name it `watchsr-deployment.zip`
+---
 
-### 2.2 Package contents
-Your zip file should contain:
+## Etapa 3: Implantar no Windows Server
+
+### 3.1 Transferir arquivos para o servidor (FTP)
+
+1. Conecte-se ao seu servidor web via cliente FTP
+2. Navegue até a pasta raiz da web (tipicamente `www` ou similar)
+3. Envie todos os arquivos de `C:\Ivan\Empresas\MEI\Site\_publish\` para o servidor
+4. Certifique-se de que `web.config` é enviado para a mesma pasta que `index.html`
+
+### 3.2 Estrutura de pasta no servidor
+Após o upload, sua pasta web deve ter este aspecto:
 ```
-watchsr-deployment.zip
+/www/
 ├── index.html
 ├── assets/
-│   ├── bundle-xxxxx.js
-│   ├── style-xxxxx.css
-│   └── [other assets]
-└── [any other static files]
+│   ├── index-*.js
+│   ├── index-*.css
+│   └── logo-*.png
+├── web.config  ← Crítico para roteamento SPA
+└── [outros arquivos se houver]
 ```
 
 ---
 
-## Step 3: Deploy to Windows Server
+## Etapa 4: Configurar IIS 10
 
-### 3.1 Transfer files to server
+### 4.1 Verificar pré-requisitos
 
-**Method A: RDP + File Copy**
-1. Connect to Windows Server via Remote Desktop
-2. Create deployment folder: `C:\inetpub\wwwroot\watchsr\`
-3. Copy `watchsr-deployment.zip` to the server
-4. Extract zip contents into the deployment folder
+**Módulo URL Rewrite** é necessário para roteamento SPA do Vue Router.
 
-**Method B: Network Share**
-1. Create a network share on the server
-2. Copy zip file to share
-3. Extract on server
+Para verificar se está instalado:
+1. Abra o IIS Manager
+2. Procure por **URL Rewrite** na lista de recursos principais
+3. Se não estiver presente:
+   - Baixe: [Módulo IIS URL Rewrite](https://www.iis.net/downloads/microsoft/url-rewrite)
+   - Instale no servidor
+   - Reinicie o IIS
 
-**Method C: FTP/SFTP** (if available)
-1. Connect to server via FTP client
-2. Upload zip file
-3. Extract on server
+### 4.2 Configuração da Aplicação
 
-### 3.2 Folder structure on server
-After extraction, your IIS folder should look like:
-```
-C:\inetpub\wwwroot\watchsr\
-├── index.html
-├── assets/
-│   ├── ...
-├── web.config  ← Copy this file from your project
-└── [other files]
-```
+O arquivo `web.config` inclui:
+- **URL Rewrite** (Roteamento SPA do Vue Router)
+- **Compressão Gzip** para ativos
+- **Tipos MIME apropriados** para JavaScript e CSS modernos
+- **Configurações de segurança** (navegação de diretório desabilitada)
+
+Se o site estiver hospedado em uma subpasta, isso é tratado automaticamente pela configuração de compilação.
 
 ---
 
-## Step 4: Configure IIS 10
+## Etapa 5: Testar a Implantação
 
-### 4.1 Check prerequisites
+1. Abra seu navegador e navegue até seu site
+2. A página inicial deve carregar ✅
+3. Clique em links - Vue Router deve lidar com a navegação sem recarga de página
+4. Teste o link de ativação (se tiver um):
+   - Navegue até `https://seudominio.com/activate?id=SEU_ID_ATIVACAO`
+   - Deve invocar a API e mostrar mensagem de sucesso/erro
 
-**URL Rewrite Module** is required for Vue Router SPA routing.
-
-To check if installed:
-1. Open IIS Manager
-2. Look for **URL Rewrite** in the main features list
-3. If not present:
-   - Download: [IIS URL Rewrite Module](https://www.iis.net/downloads/microsoft/url-rewrite)
-   - Install on the server
-   - Restart IIS
-
-### 4.2 Create Application in IIS
-
-1. Open **IIS Manager** on Windows Server
-2. Right-click on **Sites** → **Add Website**
-3. Configure:
-   - **Site name:** `WatchSR` (or your preferred name)
-   - **Physical path:** `C:\inetpub\wwwroot\watchsr\`
-   - **Binding type:** `http`
-   - **IP address:** All Unassigned
-   - **Port:** `80` (or your configured port)
-   - **Host name:** Your domain (e.g., `watchsr.yourdomain.com`)
-   - Click **OK**
-
-### 4.3 Deploy web.config
-
-1. Copy `web.config` from your local project to the IIS application folder
-2. Path: `C:\inetpub\wwwroot\watchsr\web.config`
-
-**web.config contents:**
-This file handles:
-- URL rewriting for Vue Router (SPA routing)
-- Static file caching
-- Compression for assets
-- MIME types for all asset types
-
-### 4.4 Configure application pool
-
-1. In IIS Manager, expand **Application Pools**
-2. Right-click the pool for your application → **Basic Settings**
-3. Ensure:
-   - **.NET CLR version:** No Managed Code (since we're serving static files)
-   - **Managed pipeline mode:** Integrated or Classic
-
-### 4.5 Test the deployment
-
-1. Open a browser
-2. Navigate to: `http://localhost` (or your configured domain)
-3. You should see the home page ✅
-
-**Test authentication:**
-1. Click "Saiba Mais" on the home page
-2. You should be redirected to `/auth` (anonymous user)
-3. Log in with valid credentials
-4. After login, you should be redirected to `/watchsr`
+**Testar autenticação:**
+1. Vá para página de login
+2. Faça login com credenciais válidas
+3. Após login, você deve acessar páginas protegidas
 
 ---
 
-## Step 5: Update API Configuration
+## Etapa 6: Verificar Configuração de API
 
-The API endpoint is configured in `src/service/api.js`:
+O ponto final da API é configurado em `src/service/api.js` e está definido como **URL de produção por padrão**:
 
 ```javascript
-const API_BASE_URL = 'https://localhost:7132';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://www.ibpsys.com.br/watchsr';
 ```
 
-**Update this if your API is on a different server:**
+**Se você precisar alter isso:**
 
-### Updating the API endpoint after deployment
-
-1. **If you need to change the API URL:**
-   - Edit `src/service/api.js` on your local machine
-   - Change `API_BASE_URL` to your production API server
-   - Rebuild: `npm run build`
-   - Redeploy the `dist/` folder
-
-2. **Or use environment variables (recommended for future):**
-   - Modify `vite.config.js` to support `.env` files
-   - Create `.env.production` with your production API URL
-   - Access via `import.meta.env.VITE_API_BASE_URL`
+1. Edite `src/service/api.js` na sua máquina local
+2. Atualize a URL padrão
+3. Recompile: `npm run build`
+4. Envie os novos arquivos de `C:\Ivan\Empresas\MEI\Site\_publish\`
 
 ---
 
-## Complete Deployment Checklist
+## Lista de Verificação Completa de Implantação
 
-- [ ] Run `npm install` on local machine
-- [ ] Run `npm run build`
-- [ ] Create `watchsr-deployment.zip` from `dist/` folder
-- [ ] Transfer zip to Windows Server
-- [ ] Extract to `C:\inetpub\wwwroot\watchsr\`
-- [ ] Copy `web.config` to application folder
-- [ ] Install URL Rewrite Module (if needed)
-- [ ] Create website in IIS Manager
-- [ ] Test application in browser
-- [ ] Test authentication flow
-- [ ] Document any API URL changes
+- [ ] Execute `npm install` na máquina local
+- [ ] Execute `npm run build` para criar a pasta `_publish/`
+- [ ] Transfira todos os arquivos de `C:\Ivan\Empresas\MEI\Site\_publish\` para o servidor via FTP
+- [ ] Certifique-se de que `web.config` foi enviado para a pasta raiz
+- [ ] Instale o Módulo URL Rewrite no servidor (se necessário)
+- [ ] Verifique se o site IIS aponta para a pasta correta
+- [ ] Teste a aplicação no navegador
+- [ ] Teste o link de ativação (com ID de ativação)
+- [ ] Teste o fluxo de autenticação
 
 ---
 
-## Future Deployments
+## Implantações Futuras
 
-Simplified process for subsequent deployments:
+Para implantações subsequentes:
 
-```bash
-# 1. Local machine
-npm install
-npm run build
+1. **Máquina local:**
+   ```bash
+   npm install
+   npm run build
+   ```
 
-# 2. Create deployment package
-Compress-Archive -Path ".\dist\*" -DestinationPath "watchsr-deployment.zip" -Force
+2. **Enviar via FTP:**
+   - Envie todos os arquivos de `C:\Ivan\Empresas\MEI\Site\_publish\` para seu servidor web
+   - Sobrescreva os arquivos existentes
 
-# 3. On server: Extract and remove old dist folder
-Remove-Item "C:\inetpub\wwwroot\watchsr\assets" -Recurse -Force
-Remove-Item "C:\inetpub\wwwroot\watchsr\index.html" -Force
-
-# 4. Extract new files from zip
-Expand-Archive "watchsr-deployment.zip" -DestinationPath "C:\inetpub\wwwroot\watchsr\" -Force
-
-# 5. Optional: Restart application pool (in IIS Manager or PowerShell)
-Restart-WebAppPool -Name "WatchSR"
-```
+3. **Atualizar Cache do IIS (se necessário):**
+   - No IIS Manager, clique em seu site
+   - Clique em **Reiniciar** (no painel de Ações à direita)
 
 ---
 
-## Troubleshooting
+## Resolução de Problemas
 
-### Issue: Page shows 404 when refreshing
-**Solution:** Ensure `web.config` is in the application folder and URL Rewrite is installed.
+### Problema: Página mostra 404 ao atualizar
+**Solução:** Certifique-se de que `web.config` está na pasta raiz e que o Módulo URL Rewrite está instalado no servidor.
 
-### Issue: Cannot access API from deployed site
-**Solution:** Check API URL in `src/service/api.js` - ensure it's accessible from the server.
+### Problema: Não é possível acessar a API do site implantado
+**Solução:** Verifique a URL da API no console do navegador (F12). Verifique se o servidor de API é acessível a partir do seu servidor web.
 
-### Issue: Authentication token not persisting
-**Solution:** Check browser console (F12) for errors. Ensure localStorage is not disabled.
+### Problema: Token de autenticação não persiste
+**Solução:** Verifique o console do navegador (F12) para erros. Certifique-se de que localStorage está ativado e não bloqueado por políticas.
 
-### Issue: Assets not loading (CSS/JS is broken)
-**Solution:** Ensure all files from `dist/assets/` are copied to the server.
+### Problema: Ativos não carregam (CSS/JS está quebrado)
+**Solução:** Verifique se todos os arquivos da pasta `assets/` foram enviados. Verifique os logs do IIS se houver erros 404.
 
----
-
-## Important Notes
-
-1. **Static Site Only:** This application requires NO runtime environment on the server. It's purely HTML/CSS/JS.
-
-2. **API Dependency:** The application communicates with your .NET API at `https://localhost:7132` - ensure this is accessible from the server.
-
-3. **HTTPS (Recommended for Production):**
-   - Request an SSL certificate for your domain
-   - Bind HTTPS in IIS
-   - Update API calls to use HTTPS
-
-4. **Browser Caching:** The `web.config` sets 365-day cache for assets. When deploying updates, files will receive new hash names from Vite build, forcing browser updates.
+### Problema: Página de ativação mostra erro
+**Solução:** Verifique se o parâmetro `id` está sendo passado corretamente na URL. Verifique se o ponto final da API é acessível.
 
 ---
 
-## Support Resources
+## Notas Importantes
 
-- [IIS Documentation](https://docs.microsoft.com/en-us/iis/)
-- [URL Rewrite Module](https://www.iis.net/downloads/microsoft/url-rewrite)
-- [Vue Router Configuration](https://router.vuejs.org/)
-- [Vite Deployment Guide](https://vitejs.dev/guide/static-deploy.html)
+1. **Apenas Site Estático:** Esta aplicação não requer nenhum ambiente de tempo de execução no servidor. É puramente HTML/CSS/JS.
+
+2. **Dependência de API:** A aplicação se comunica com sua API .NET no ponto final configurado - certifique-se de que é acessível a partir do seu servidor.
+
+3. **HTTPS (Recomendado para Produção):**
+   - Solicite um certificado SSL para seu domínio
+   - Vincule HTTPS no IIS
+   - Atualize a configuração da API se necessário
+
+4. **Cache do Navegador:** O `web.config` define cache de 365 dias para ativos. O Vite gera automaticamente novos nomes de hash para arquivos em cada compilação, portanto os navegadores sempre buscarão a versão mais recente.
+
+5. **Links de Ativação:** Os usuários devem receber emails de ativação com links como:
+   ```
+   https://seudominio.com/activate?id=SEU_ID_CRIPTOGRAFIA
+   ```
+   A página de ativação invocará automaticamente a API e mostrará o resultado.
 
 ---
 
-**Last Updated:** March 2026
-**Application:** WatchSR Vue.js Frontend
-**Server:** Windows Server with IIS 10
+## Recursos de Suporte
+
+- [Documentação do IIS](https://docs.microsoft.com/pt-br/iis/)
+- [Módulo URL Rewrite](https://www.iis.net/downloads/microsoft/url-rewrite)
+- [Configuração do Vue Router](https://router.vuejs.org/)
+- [Guia de Implantação do Vite](https://vitejs.dev/guide/static-deploy.html)
+
+---
+
+**Última Atualização:** 20 de março de 2026
+**Aplicação:** Frontend Vue.js WatchSR
+**Servidor:** Windows Server com IIS 10

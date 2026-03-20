@@ -1,214 +1,341 @@
-# IIS Server Setup Guide
-## Windows Server with IIS 10 - WatchSR Application
+# Guia de Configuração do Servidor IIS
+## Windows Server com IIS 10 - Aplicação WatchSR
 
-This guide is for Windows Server administrators who need to deploy and configure the WatchSR Vue.js application on IIS 10.
-
----
-
-## Prerequisites
-
-### Required Components
-- Windows Server 2016 or later
-- IIS 10 (included with Windows Server 2016+)
-- URL Rewrite Module for IIS 10
-- Internet browser for testing
-
-### Optional but Recommended
-- SSL Certificate (for HTTPS)
-- Administrative access to IIS Manager
+Este guia é para administradores do Windows Server que precisam implantar e configurar a aplicação Vue.js WatchSR no IIS 10.
 
 ---
 
-## Installation Steps
+## Pré-requisitos
 
-### Step 1: Install URL Rewrite Module
+### Componentes Necessários
+- Windows Server 2016 ou posterior
+- IIS 10 (incluído com Windows Server 2016+)
+- Módulo URL Rewrite para IIS 10
+- FTP ou acesso a arquivo para fazer upload dos arquivos da aplicação
 
-The URL Rewrite Module is **required** for Vue Router single-page application (SPA) routing to work.
-
-**Installation:**
-
-1. Download from Microsoft: [URL Rewrite for IIS](https://www.iis.net/downloads/microsoft/url-rewrite)
-2. Run the installer
-3. Follow the installation wizard
-4. Restart IIS after installation:
-   ```powershell
-   iisreset
-   ```
-
-**Verify Installation:**
-1. Open IIS Manager
-2. Click on the server name in the tree view
-3. Look for "URL Rewrite" in the main features list
-4. If present, installation was successful ✅
+### Opcional mas Recomendado
+- Certificado SSL (para HTTPS)
+- Acesso administrativo ao IIS Manager
 
 ---
 
-### Step 2: Create Folder Structure
+## Etapas de Instalação
 
-Create the application folder on the server:
+### Etapa 1: Instalar Módulo URL Rewrite
 
-```powershell
-# Create main application folder
-New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\watchsr" -Force
+O Módulo URL Rewrite é **necessário** para o roteamento de aplicação de página única (SPA) do Vue Router funcionar.
 
-# Set appropriate permissions (IUSR account needs read access)
-$Path = "C:\inetpub\wwwroot\watchsr"
-$Acl = Get-Acl $Path
-$AccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-    "IIS AppPool\DefaultAppPool", 
-    "ReadAndExecute", 
-    "ContainerInherit,ObjectInherit",
-    "None", 
-    "Allow"
-)
-$Acl.AddAccessRule($AccessRule)
-Set-Acl -Path $Path -AclObject $Acl
-```
+**Instalação:**
+
+1. Baixe da Microsoft: [URL Rewrite para IIS](https://www.iis.net/downloads/microsoft/url-rewrite)
+2. Execute o instalador
+3. Siga o assistente de instalação
+4. Reinicie o IIS após a instalação
+
+**Verificar Instalação:**
+1. Abra o IIS Manager
+2. Clique no nome do servidor na árvore de visão
+3. Procure por "URL Rewrite" na lista de recursos principais
+4. Se presente, a instalação foi bem-sucedida ✅
 
 ---
 
-### Step 3: Deploy Application Files
+### Etapa 2: Criar Estrutura de Pasta
 
-1. **Transfer the zip file** (`watchsr-deployment.zip`) to the server
-2. **Extract to the application folder:**
-   ```powershell
-   $ZipPath = "C:\path\to\watchsr-deployment.zip"
-   $ExtractPath = "C:\inetpub\wwwroot\watchsr"
-   
-   Expand-Archive -Path $ZipPath -DestinationPath $ExtractPath -Force
-   ```
+Crie a pasta da aplicação no servidor. Você pode colocá-la em:
+- `C:\inetpub\wwwroot\` (raiz padrão do IIS)
+- Ou em qualquer outro local acessível ao IIS
 
-3. **Verify web.config is present:**
-   ```powershell
-   Test-Path "C:\inetpub\wwwroot\watchsr\web.config"
-   ```
+Caminhos de exemplo:
+- `C:\inetpub\wwwroot\watchsr\` - para implantação em subpasta
+- `C:\inetpub\wwwroot\` - para implantação na raiz
+
+Certifique-se de que o serviço IIS tenha permissões de leitura nesta pasta.
 
 ---
 
-### Step 4: Create IIS Website
+### Etapa 3: Fazer Upload de Arquivos da Aplicação
 
-#### Using IIS Manager (GUI)
+1. **Conecte-se ao seu servidor via FTP** usando seu cliente FTP
+2. **Navegue até sua pasta de implantação** (ex: `www` ou similar)
+3. **Envie todos os arquivos** de `C:\Ivan\Empresas\MEI\Site\_publish\`:
+   - `index.html`
+   - `web.config` (crítico para roteamento SPA)
+   - pasta `assets/` (com todo conteúdo)
+   - Qualquer outro arquivo de ativo
 
-1. Open **IIS Manager**
-2. In the left panel, expand your server name
-3. Right-click on **Sites** → **Add Website**
-4. Fill in the following information:
+4. **Verifique o upload de arquivo:**
+   - Certifique-se de que `web.config` está na raiz sua pasta de implantação
+   - Certifique-se de que `index.html` está na mesma pasta
+   - Certifique-se de que a pasta `assets/` está presente com todo conteúdo
 
-   | Field | Value |
+---
+
+### Etapa 4: Criar Site IIS
+
+#### Usando IIS Manager (GUI)
+
+1. Abra **IIS Manager**
+2. No painel esquerdo, expanda o nome do seu servidor
+3. Clique com botão direito em **Sites** → **Adicionar Site**
+4. Preencha as seguintes informações:
+
+   | Campo | Valor |
    |-------|-------|
-   | Site name | `WatchSR` |
-   | Physical path | `C:\inetpub\wwwroot\watchsr` |
-   | Binding type | `http` or `https` |
-   | IP address | All Unassigned |
-   | Port | `80` (http) or `443` (https) |
-   | Host name | `watchsr.yourdomain.com` (or leave blank) |
+   | Nome do site | `WatchSR` ou seu nome preferido |
+   | Caminho físico | Caminho para sua pasta de implantação |
+   | Tipo de vinculação | `http` ou `https` |
+   | Endereço IP | Todos Não Atribuídos |
+   | Porta | `80` (http) ou `443` (https) |
+   | Nome do host | Seu nome de domínio (ou deixe em branco) |
 
-5. Click **OK**
+5. Clique em **OK**
 
-#### Using PowerShell
+**Exemplo para implantação na raiz:**
+- Nome do site: `WatchSR`
+- Caminho físico: `C:\inetpub\wwwroot\`
+- Vinculação: `http`, Porta `80`, Nome do host: `www.ibpsys.com.br`
 
-```powershell
-# Create new IIS website
-New-IISSite -Name "WatchSR" `
-    -PhysicalPath "C:\inetpub\wwwroot\watchsr" `
-    -BindingInformation "*:80:" `
-    -Protocol http
-
-# For HTTPS (if certificate available)
-New-IISSite -Name "WatchSR-HTTPS" `
-    -PhysicalPath "C:\inetpub\wwwroot\watchsr" `
-    -BindingInformation "*:443:watchsr.yourdomain.com" `
-    -Protocol https `
-    -CertificateThumbprint "YOUR_CERT_THUMBPRINT"
-```
+6. Clique em **OK** para criar o site
 
 ---
 
-### Step 5: Configure Application Pool
+### Etapa 5: Verificar Pool de Aplicação
 
-1. In IIS Manager, expand **Application Pools**
-2. Find the app pool for your WatchSR site
-3. Right-click → **Basic Settings**
-4. Ensure the following:
-   - **.NET CLR version:** `No Managed Code` (static files only)
-   - **Managed pipeline mode:** `Integrated` (recommended)
-
----
-
-### Step 6: Verify URL Rewrite Rules
-
-1. In IIS Manager, click on your WatchSR site
-2. Double-click **URL Rewrite**
-3. Verify that rules are in place:
-   - You should see the Vue Router rule
-   - If not visible, the `web.config` file may not be deployed
-
-**If rules don't appear:**
-- Ensure `web.config` is in `C:\inetpub\wwwroot\watchsr\`
-- Restart IIS: `iisreset`
-- Refresh IIS Manager
+1. No IIS Manager, expanda **Application Pools**
+2. Encontre o pool de aplicação para seu site WatchSR
+3. Clique com botão direito → **Configurações Básicas**
+4. Certifique-se de que:
+   - **Versão .NET CLR:** `Nenhum Código Gerenciado` (apenas arquivos estáticos)
+   - **Modo de pipeline gerenciado:** `Integrado`
 
 ---
 
-## Testing the Deployment
+### Etapa 6: Verificar Regras de URL Rewrite
 
-### Test 1: Basic Access
+1. No IIS Manager, clique em seu site WatchSR
+2. Clique duas vezes em **URL Rewrite**
+3. Verifique se as regras estão em vigor:
+   - Você deve ver a "Regra do Vue Router"
+   - Se as regras não aparecerem, certifique-se de que `web.config` está na pasta correta
 
-1. Open a browser on the server (or another machine)
-2. Navigate to: `http://localhost/` (if bound to port 80)
-3. You should see the WatchSR home page
-
-✅ **Success:** Home page displays correctly
-
-❌ **Failure:** 
-- Check that files were extracted to the correct folder
-- Verify the website binding in IIS
-
----
-
-### Test 2: Authentication Flow
-
-1. On the home page, click **"Saiba Mais"**
-2. You should be redirected to the Auth page (`/auth`)
-3. This verifies Vue Router is working correctly
-
-✅ **Success:** Auth page displays
-
-❌ **Failure:**
-- Verify URL Rewrite module is installed
-- Check that `web.config` is present in the application folder
-- Restart IIS: `iisreset`
+**Se as regras não aparecerem:**
+- Verifique que `web.config` está na pasta raiz da aplicação
+- Reinicie o IIS Manager ou reinicie o servidor
+- Limpe o cache do IIS (se necessário)
 
 ---
 
-### Test 3: API Connectivity
+### Etapa 7: Testar a Aplicação
 
-1. On the Auth page, enter test credentials
-2. Click "Login"
-3. Watch the browser Network tab (F12) for API calls
-
-✅ **Success:** Request is sent to the API
-   - Check Network tab → find "login" request
-   - Verify response status is 200 or 401 (authentication error is OK)
-   - If getting 503 or timeout, API server is unreachable
-
-❌ **Failure:**
-- API server may not be running or accessible
-- Check API URL in the deployment (see Configuration section below)
+1. Abra um navegador de internet
+2. Navegue até a URL do seu site (ex: `http://www.ibpsys.com.br`)
+3. Você deve ver a página inicial ✅
+4. Clique em links de navegação - eles devem funcionar sem recarregamento de página
+5. Teste a página de login e autenticação
 
 ---
 
-## Configuration
+## Detalhes de Configuração
 
-### Changing the API Endpoint
+### Arquivo web.config
 
-The application communicates with the .NET API at: `https://localhost:7132`
+O arquivo `web.config` incluído no pacote de implantação inclui:
 
-**To change this endpoint:**
+✅ **Roteamento SPA do Vue Router** - Reescreve todas as solicitações que não são arquivo para `index.html`  
+✅ **Compressão Gzip** - Comprime ativos para entrega mais rápida  
+✅ **Mapeamento de Tipo MIME** - Tipos apropriados para formatos de arquivo modernos (.mjs, .woff2, etc.)  
+✅ **Segurança** - Impede listagem de diretório  
+✅ **Cache** - Define cache de 365 dias para ativos (com atualizações automáticas via hash)  
+✅ **Suporte PHP** - Mantido da configuração do servidor original  
 
-**Option 1: Modify web.config (NOT recommended - requires code change)**
-The API endpoint is hardcoded in the deployed code. To change it:
-1. Get the source code back from the developer
+Esta configuração é **já otimizada** - você não deve precisar modificá-la.
+
+---
+
+## Resolução de Problemas
+
+### Problema: Página mostra 404 ao atualizar ou navegar
+
+**Causas:**
+- `web.config` não está na pasta correta
+- Módulo URL Rewrite não instalado
+- IIS não está lendo o `web.config` corretamente
+
+**Soluções:**
+1. Verifique que o arquivo `web.config` existe na pasta raiz da aplicação
+2. Verifique se o Módulo URL Rewrite está instalado (veja a Etapa 1)
+3. Reinicie o IIS Manager: pressione F5 ou feche/abra novamente
+4. Se necessário, reinicie o serviço IIS via Services.msc
+
+### Problema: Não é possível acessar a aplicação
+
+**Causas:**
+- Site não criado corretamente no IIS
+- Caminho físico incorreto
+- Pool de Aplicação IIS não iniciado
+
+**Soluções:**
+1. Verifique se o site existe e está iniciado no IIS Manager
+2. Verifique se o caminho físico aponta para a pasta correta
+3. Verifique se o Pool de Aplicação está iniciado (clique com botão direito → Iniciar)
+4. Verifique permissões de pasta - o serviço IIS precisa de acesso de leitura
+
+### Problema: Arquivos retornam erros 404 (CSS/JS quebrado)
+
+**Causas:**
+- Pasta de ativos não foi enviada
+- Tipos MIME não configurados
+- Problemas de caminho de arquivo
+
+**Soluções:**
+1. Verifique se a pasta `assets/` existe e contém arquivos
+2. Verifique a configuração de tipo MIME em `web.config`
+3. Verifique se todos os arquivos foram enviados corretamente via FTP
+
+### Problema: Imagens não sendo exibidas
+
+**Causa:**
+- Arquivos de imagem não foram enviados
+- Permissões de arquivo
+
+**Soluções:**
+1. Verifique se os arquivos de imagem foram enviados para a pasta `assets/`
+2. Verifique se os nomes de arquivo correspondem exatamente (sensível a maiúsculas/minúsculas em alguns sistemas)
+3. Verifique se o IIS possui permissões de leitura em arquivos de imagem
+
+### Problema: Chamadas de API retornando erros CORS
+
+**Causas:**
+- Problema na configuração do servidor de API (não relacionado a IIS)
+- Ponto final da API não acessível a partir do servidor web
+
+**Soluções:**
+1. Verifique se a URL do ponto final da API é acessível a partir do servidor
+2. Verifique a política CORS do servidor de API
+3. Revise os logs da aplicação no navegador F12 (abas Network/Console)
+
+### Problema: Página de ativação não funciona
+
+**Causas:**
+- Parâmetro `id` não fornecido na URL
+- Ponto final da API não acessível
+
+**Soluções:**
+1. Verifique se a URL inclui o parâmetro `id` da consulta: `?id=SEU_ID`
+2. Verifique o console do navegador (F12) para erros de API
+3. Verifique se o ponto final da API é acessível e retorna resposta apropriada
+
+---
+
+## Otimização de Desempenho
+
+### Cache de Ativos
+
+O `web.config` está configurado para armazenar em cache os ativos por 365 dias. Isto significa:
+- **Primeira visita:** Arquivos são baixados e armazenados
+- **Visitas subsequentes:** Arquivos armazenados em cache são usados (muito rápido)
+- **Após atualização:** Novos arquivos recebem novos nomes de hash, forçando o navegador a baixar a versão mais recente
+
+Isto já está otimizado - nenhuma alteração necessária.
+
+### Compressão GZIP
+
+Ativos estáticos são automaticamente compactados. Isto:
+- Reduz tamanhos de arquivo em 60-70%
+- Acelera carregamento de página
+- É transparente para o navegador (descompactado automaticamente)
+
+---
+
+## Considerações de Segurança
+
+### HTTPS (Recomendado para Produção)
+
+1. Obtenha um certificado SSL para seu domínio
+2. No IIS Manager:
+   - Clique com botão direito em seu site → **Editar Vinculações**
+   - Clique em **Adicionar**
+   - Selecione `https`, porta `443`, selecione seu certificado
+3. Opcionalmente: Redirecione HTTP para HTTPS
+
+### Navegação de Diretório
+
+- **Desativada** por padrão em `web.config` ✅
+- Os usuários não podem ver o conteúdo da pasta
+- Apenas os arquivos acessíveis são servidos
+
+### Comunicação de API
+
+- As chamadas de API devem usar HTTPS em produção
+- Atualize `src/service/api.js` para usar ponto final HTTPS se necessário
+
+---
+
+## Tarefas Comuns
+
+### Reimplantando a Aplicação Atualizada
+
+Quando você tiver uma nova compilação dos desenvolvedores:
+
+1. Baixe os arquivos mais recentes dos desenvolvedores (da pasta `_publish/`)
+2. Conecte-se ao servidor via FTP
+3. Envie todos os arquivos, sobrescrevendo os existentes
+4. No IIS Manager, clique em seu site e pressione **Reiniciar** (barra lateral direita)
+5. Limpe seu cache do navegador (Ctrl+Shift+Delete) e atualize
+
+### Verificando Arquivos de Log da Aplicação
+
+Os logs do IIS normalmente estão em:
+- `C:\inetpub\logs\LogFiles\W3SVC1\` (para seu site)
+
+Os erros da aplicação também podem aparecer em:
+- Visualizador de Eventos do Windows → Logs do Windows → Aplicação
+
+### Gerenciando Pool de Aplicação
+
+No IIS Manager:
+- Clique com botão direito em Pool de Aplicação → **Iniciar/Parar/Reiniciar**
+- Use isso para limpar memória ou recarregar configuração
+
+---
+
+## Notas Importantes
+
+1. **Apenas Site Estático**
+   - Esta aplicação é JavaScript/CSS/HTML puro
+   - Nenhum ambiente de tempo de execução necessário
+   - Recursos mínimos do servidor necessários
+
+2. **Roteamento SPA do Vue Router**
+   - Módulo URL Rewrite é **essencial**
+   - `web.config` é **crítico** para roteamento
+   - Sem isso, deep linking não funcionará
+
+3. **Comunicação de API**
+   - A aplicação chama API externa .NET
+   - Certifique-se de que o servidor de API é acessível a partir do servidor web
+   - Verifique firewalls de rede Se as chamadas de API falharem
+
+4. **Navegador e Lado do Cliente**
+   - Tokens de autenticação armazenados em localStorage do navegador
+   - Logout limpa localStorage
+   - Funciona em todos os navegadores modernos
+
+---
+
+## Recursos de Suporte
+
+- [Documentação do IIS](https://docs.microsoft.com/pt-br/iis/)
+- [Guia do Módulo URL Rewrite](https://docs.microsoft.com/pt-br/iis/extensions/url-rewrite-module/)
+- [Documentação do Vue Router](https://router.vuejs.org/)
+- [Hospedagem ASP.NET Core no IIS](https://docs.microsoft.com/pt-br/aspnet/core/host-and-deploy/iis/)
+
+---
+
+**Última Atualização:** 20 de março de 2026
+**Aplicação:** Frontend Vue.js WatchSR
+**Pasta de Implantação:** `C:\Ivan\Empresas\MEI\Site\_publish\`
 2. Modify `src/service/api.js`
 3. Rebuild and redeploy
 

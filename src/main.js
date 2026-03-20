@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import Home from './pages/Home.vue'
 import Auth from './pages/Auth.vue'
+import Activate from './pages/Activate.vue'
 import WatchSR from './pages/WatchSR.vue'
 import { authService } from './service/authService'
 import './style.css'
@@ -17,6 +18,11 @@ const routes = [
     path: '/auth',
     name: 'Auth',
     component: Auth
+  },
+  {
+    path: '/activate',
+    name: 'Activate',
+    component: Activate
   },
   {
     path: '/watchsr',

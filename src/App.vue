@@ -10,7 +10,7 @@
     <nav>
       <div class="nav-container">
         <router-link to="/" class="logo-link">
-          <img src="../../src/assets/logo.png" alt="Company Logo" class="logo">
+          <img src="./assets/logo.png" alt="Company Logo" class="logo">
         </router-link>
         <div class="nav-links">
           <router-link to="/">Home</router-link>
