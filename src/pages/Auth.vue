@@ -1,6 +1,14 @@
 <template>
   <div class="auth-page">
     <div class="auth-container">
+      <div class="auth-intro">
+        <h2>Acesso aos Produtos</h2>
+        <p>Para acessar nossos produtos e serviços, você precisa estar autenticado.<br />
+        Este passo é necessário para garantir a legalidade, segurança e integridade dos seus dados em nossa plataforma.<br />
+        Para mais informações sobre como utilizamos seus dados, consulte nossa <router-link to="/privacy-policy" class="link">Política de Privacidade</router-link>, <router-link to="/data-retention" class="link">Política de Retenção de Dados</router-link> e <router-link to="/subscribing-policy" class="link">Política de Assinatura</router-link>.<br />
+        Faça login ou cadastre-se caso ainda não possua uma conta.</p>
+      </div>
+
       <div class="auth-tabs">
         <button 
           :class="['tab-button', { active: activeTab === 'signin' }]"

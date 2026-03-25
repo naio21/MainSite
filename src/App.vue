@@ -14,7 +14,7 @@
         </router-link>
         <div class="nav-links">
           <router-link to="/">Home</router-link>
-          <router-link to="/watchsr">Watch SR</router-link>
+          <router-link to="/products">Produtos</router-link>
           <button 
             v-if="isAuthenticated" 
             @click="handleLogout" 
@@ -26,14 +26,19 @@
       </div>
     </nav>
     <router-view></router-view>
+    <Footer></Footer>
   </div>
 </template>
 
 <script>
 import { authService } from './service/authService';
+import Footer from './components/Footer.vue';
 
 export default {
   name: 'App',
+  components: {
+    Footer
+  },
   data() {
     return {
       isAuthenticated: false,

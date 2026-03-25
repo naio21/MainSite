@@ -144,12 +144,12 @@ c:\Ivan\Empresas\MEI\Site\www\
 │   ├── assets/
 │   │   └── logo.png
 │   ├── components/
-│   │   └── HelloWorld.vue
+│   │   └── Footer.vue
 │   ├── pages/
 │   │   ├── Auth.vue         (Login/Signup)
 │   │   ├── Activate.vue     (Página de ativação)
 │   │   ├── Home.vue         (Página inicial)
-│   │   └── WatchSR.vue      (Página protegida)
+│   │   └── Products.vue     (Página protegida)
 │   └── service/
 │       ├── api.js           (Configuração Axios)
 │       └── authService.js   (Lógica de autenticação)

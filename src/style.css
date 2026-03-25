@@ -218,11 +218,6 @@ nav a:hover {
   color: #662c0b;
 }
 
-/* ===== HelloWorld.vue Styles ===== */
-.read-the-docs {
-  color: #888;
-}
-
 /* ===== Home.vue Styles ===== */
 .home {
   width: 100%;
@@ -317,7 +312,7 @@ nav a:hover {
 
 /* ===== Auth.vue Styles ===== */
 .auth-page {
-  min-height: 100vh;
+  /*min-height: 100vh;*/
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
@@ -332,6 +327,27 @@ nav a:hover {
   max-width: 500px;
   width: 100%;
   overflow: hidden;
+}
+
+.auth-intro {
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.auth-intro h2 {
+  color: #333;
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.auth-intro p {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: justify;
 }
 
 .auth-tabs {
@@ -566,4 +582,182 @@ body {
   max-width: none;
   width: 100%;
   padding: 0 2rem;   /* keep side padding if desired */
+}
+/* ===== Footer.vue Styles ===== */
+.footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  padding: 30px 0;
+  margin-top: 50px;
+  font-size: 14px;
+  color: #666;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.footer-links {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.footer-link {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.separator {
+  color: #ccc;
+  margin: 0 8px;
+}
+
+.footer-info p {
+  margin: 0;
+  color: #999;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 20px 0;
+    margin-top: 30px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .separator {
+    display: none;
+  }
+}
+
+/* ===== Legal Pages Styles (PrivacyPolicy, DataRetention, SubscribingPolicy) ===== */
+.legal-page {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.legal-page .back-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: background-color 0.3s;
+}
+
+.legal-page .back-button:hover {
+  background-color: #0056b3;
+}
+
+.legal-page h1 {
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.legal-page .content {
+  color: #666;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-align: justify;
+}
+
+.legal-page .content p {
+  margin-bottom: 15px;
+}
+
+.legal-page .content h2 {
+  color: #333;
+  margin-bottom: 10px;
+  text-align: justify;
+}
+
+.legal-page .content ul {
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+.legal-page .content li {
+  margin-bottom: 10px;
+  text-align: justify;
+}
+
+/* ===== Products.vue Styles ===== */
+.download-page {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.download-page h1 {
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 2rem;
+}
+
+.download-page h2 {
+  color: #333;
+  margin-bottom: 15px;
+  margin-top: 20px;
+  font-size: 1.3rem;
+  text-align: justify;
+}
+
+.download-page p {
+  color: #666;
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+.download-page ul {
+  margin-bottom: 20px;
+  padding-left: 20px;
+}
+
+.download-page li {
+  color: #666;
+  margin-bottom: 10px;
+  text-align: justify;
+}
+
+.download-button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.download-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }

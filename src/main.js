@@ -4,7 +4,10 @@ import App from './App.vue'
 import Home from './pages/Home.vue'
 import Auth from './pages/Auth.vue'
 import Activate from './pages/Activate.vue'
-import WatchSR from './pages/WatchSR.vue'
+import Products from './pages/Products.vue'
+import PrivacyPolicy from './pages/PrivacyPolicy.vue'
+import DataRetention from './pages/DataRetention.vue'
+import SubscribingPolicy from './pages/SubscribingPolicy.vue'
 import { authService } from './service/authService'
 import './style.css'
 
@@ -25,10 +28,25 @@ const routes = [
     component: Activate
   },
   {
-    path: '/watchsr',
-    name: 'WatchSR',
-    component: WatchSR,
+    path: '/products',
+    name: 'Products',
+    component: Products,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/privacy-policy',
+    name: 'PrivacyPolicy',
+    component: PrivacyPolicy
+  },
+  {
+    path: '/data-retention',
+    name: 'DataRetention',
+    component: DataRetention
+  },
+  {
+    path: '/subscribing-policy',
+    name: 'SubscribingPolicy',
+    component: SubscribingPolicy
   }
 ]
 
