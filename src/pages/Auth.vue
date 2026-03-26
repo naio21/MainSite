@@ -394,18 +394,35 @@ export default {
       }
     },
     handleForgotPassword() {
-      // TODO: Implement forgot password endpoint with your API
-      // Your current API doesn't have a forgot password endpoint visible in Swagger
-      // You'll need to configure this with your backend
-      console.log('Forgot Password:', this.forgotForm);
-      this.forgotMessage = {
-        text: 'Funcionalidade de recuperação de senha será implementada em breve.',
-        type: 'info'
-      };
-      setTimeout(() => {
-        this.forgotForm.email = '';
-        this.forgotMessage = { text: '', type: '' };
-      }, 3000);
+      try {
+        authService.recover(this.forgotForm.email)
+          .then(response => {
+            if (response.data?.status === true) {
+              this.forgotMessage = {
+                text: response.data.mensagem || 'E-mail de recuperação enviado com sucesso! Verifique sua caixa de entrada.',
+                type: 'success'
+              };
+            } else {
+              this.forgotMessage = {
+                text: response.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
+                type: 'error'
+              };
+            }
+          })
+          .catch(error => {
+            console.error('Forgot Password error:', error);
+            this.forgotMessage = {
+              text: error.response?.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
+              type: 'error'
+            };
+          });
+      } catch (error) {
+        console.error('Error:', error);
+        this.forgotMessage = {
+          text: error.response?.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
+          type: 'error'
+        };
+      }
     },
     async handleSignUp() {
       // Validate all fields

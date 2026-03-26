@@ -12,6 +12,10 @@ export const authService = {
     });
   },
 
+recover(email) {
+  return apiClient.post('/api/Authentication/recover', { email });
+},
+
   signup(formData) {
     // Map form data to RegisterModel structure expected by the backend
     const registerModel = {

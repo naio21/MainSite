@@ -56,7 +56,7 @@ const router = createRouter({
 })
 
 // Navigation guard to check authentication
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
   const isAuthenticated = !!authService.getToken()
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
@@ -64,12 +64,13 @@ router.beforeEach((to, from, next) => {
     // Redirect to Auth page if route requires authentication and user is not authenticated
     // Store the redirect path in sessionStorage to avoid issues with query parameters
     sessionStorage.setItem('redirectPath', to.fullPath)
-    next({ name: 'Auth' })
-  } else {
-    next()
+    return { name: 'Auth' }
   }
 })
 
 const app = createApp(App)
 app.use(router)
-app.mount('#app')
+
+router.isReady().catch(() => {}).then(() => {
+  app.mount('#app')
+})
