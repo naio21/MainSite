@@ -172,7 +172,7 @@
             <p class="error-message" v-if="senhaError">{{ senhaError }}</p>
           </div>
 
-          <button type="submit" class="submit-button" :disabled="isSubmitting">
+          <button type="submit" class="submit-button" :disabled="isSubmitting || signUpSuccess">
             {{ isSubmitting ? 'Criando Conta...' : 'Criar Conta' }}
           </button>
           <p class="message" :class="signUpMessage.type" v-if="signUpMessage.text">
@@ -222,6 +222,7 @@ export default {
         text: '',
         type: ''
       },
+      signUpSuccess: false,
       nomeError: '',
       telefoneError: '',
       razaoSocialError: '',
@@ -434,17 +435,11 @@ export default {
 
         // Check if registration was successful
         if (response.data?.status === true) {
+          this.signUpSuccess = true;
           this.signUpMessage = {
-            text: 'Conta criada com sucesso! Verifique seu e-mail para ativar a conta. Redirecionando...',
+            text: 'Conta criada com sucesso! Verifique seu e-mail para ativar a conta.',
             type: 'success'
           };
-          // Reset form
-          this.resetSignUpForm();
-          // Redirect to the login tab or home after 3 seconds
-          setTimeout(() => {
-            this.activeTab = 'signin';
-            this.signUpMessage = { text: '', type: '' };
-          }, 3000);
         } else {
           this.signUpMessage = {
             text: response.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.',
