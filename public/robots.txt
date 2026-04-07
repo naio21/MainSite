@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /activate
+Disallow: /recover
+Disallow: /404

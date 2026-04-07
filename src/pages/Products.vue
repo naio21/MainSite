@@ -7,7 +7,7 @@
             <li>.NET 8 Runtime (você terá a opção de instalar durante o setup)</li>
             <li>Conexão com a internet para atualizações e sincronização de dados</li>
         </ul>
-        <a href="/downloads/Setup WatchSR.exe" class="download-button">Baixar Agora</a>
+        <a href="/downloads/setup.exe" class="download-button">Baixar Agora</a>
+        <!--a href="/downloads/WatchSR-Setup.exe" class="download-button">Baixar Agora</a-->
     </div>
-
 </template>

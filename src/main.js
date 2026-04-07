@@ -8,6 +8,8 @@ import Products from './pages/Products.vue'
 import PrivacyPolicy from './pages/PrivacyPolicy.vue'
 import DataRetention from './pages/DataRetention.vue'
 import SubscribingPolicy from './pages/SubscribingPolicy.vue'
+import NotFound from './pages/404.vue'
+import Recover from './pages/Recover.vue'
 import { authService } from './service/authService'
 import './style.css'
 
@@ -26,6 +28,11 @@ const routes = [
     path: '/activate',
     name: 'Activate',
     component: Activate
+  },
+  {
+    path: '/recover',
+    name: 'Recover',
+    component: Recover
   },
   {
     path: '/products',
@@ -47,6 +54,15 @@ const routes = [
     path: '/subscribing-policy',
     name: 'SubscribingPolicy',
     component: SubscribingPolicy
+  },
+  {
+    path: '/404',
+    name: 'NotFound',
+    component: NotFound
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
   }
 ]
 

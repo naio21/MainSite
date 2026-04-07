@@ -27,15 +27,6 @@
         </div>
         <router-link to="/auth" class="redirect-button">Voltar para Login</router-link>
       </div>
-
-      <!-- No ID State -->
-      <div v-else-if="noActivationId" class="activate-content error">
-        <div class="error-icon">✕</div>
-        <h2>Link de Ativação Inválido</h2>
-        <p>O link de ativação não contém um identificador válido.</p>
-        <p>Por favor, verifique o link enviado por e-mail.</p>
-        <router-link to="/auth" class="redirect-button">Voltar para Login</router-link>
-      </div>
     </div>
   </div>
 </template>
@@ -50,7 +41,6 @@ export default {
       loading: true,
       success: false,
       error: false,
-      noActivationId: false,
       errorMessage: 'Ocorreu um erro ao ativar sua conta. Por favor, tente novamente mais tarde.',
       errorDetails: null,
       activationId: null
@@ -67,8 +57,7 @@ export default {
 
         // Validate that we have an activation ID
         if (!this.activationId) {
-          this.loading = false;
-          this.noActivationId = true;
+          this.$router.replace('/404');
           return;
         }
 
