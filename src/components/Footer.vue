@@ -7,6 +7,8 @@
         <router-link to="/data-retention" class="footer-link">Política de Retenção de Dados</router-link>
         <span class="separator">|</span>
         <router-link to="/subscribing-policy" class="footer-link">Política de Assinaturas</router-link>
+        <span class="separator">|</span>
+        <router-link to="/contact" class="footer-link">Contato</router-link>
       </div>
       <div class="footer-info">
         <p>&copy; {{ currentYear }} IVAN BONORA PRADO MEI. Todos os direitos reservados.</p>

@@ -10,6 +10,7 @@ import DataRetention from './pages/DataRetention.vue'
 import SubscribingPolicy from './pages/SubscribingPolicy.vue'
 import NotFound from './pages/404.vue'
 import Recover from './pages/Recover.vue'
+import Contact from './pages/Contact.vue'
 import { authService } from './service/authService'
 import './style.css'
 
@@ -39,6 +40,11 @@ const routes = [
     name: 'Products',
     component: Products,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/contact',
+    name: 'Contact',
+    component: Contact
   },
   {
     path: '/privacy-policy',

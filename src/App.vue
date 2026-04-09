@@ -15,6 +15,7 @@
         <div class="nav-links">
           <router-link to="/">Home</router-link>
           <router-link to="/products">Produtos</router-link>
+          <router-link to="/contact">Contato</router-link>
           <button 
             v-if="isAuthenticated" 
             @click="handleLogout" 
