@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <div id="top"></div>
     <!-- Token Expiration Warning -->
     <div v-if="showExpiryWarning" class="expiry-warning">
       <span class="warning-icon">⚠️</span>
@@ -14,7 +15,7 @@
         </router-link>
         <div class="nav-links">
           <router-link to="/">Home</router-link>
-          <router-link to="/products">Produtos</router-link>
+          <router-link to="/watch-sr">Produtos</router-link>
           <router-link to="/contact">Contato</router-link>
           <button 
             v-if="isAuthenticated" 

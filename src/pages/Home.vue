@@ -6,13 +6,12 @@
         <h1>Bem vindo à ibpsys</h1>
         <p align="left">
           Meu nome é Ivan Bonora Prado e sou o fundador da ibpsys, minha Microempresa Individual.<br />
-          Minha visão: criar soluções inovadoras e de alta qualidade para empresas de todos os tamanhos, 
+          <strong>Minha visão:</strong> criar soluções inovadoras e de alta qualidade para empresas de todos os tamanhos, 
           atendendo a demanda dos usuários de maneira rápida, eficiente, personalizada e simples.<br />
-          Minha missão: agir com ética e transparência, oferecendo o melhor custo-benefício possível.
+          <strong>Minha missão:</strong> agir com ética e transparência, oferecendo o melhor custo-benefício possível.
         </p>
       </div>
     </section>
-
     <!-- Section 2: Product Showcase -->
     <section class="products-section">
       <div class="container">
@@ -24,18 +23,80 @@
             </div>
             <h3>Watch SR</h3>
             <p>
-              Uma aplição voltada para o gerenciamento de Ordens de Serviço para Relojoeiros, ajudando-os a organizar, otimizar e priorizar as demandas de seus clientes.
+              Uma aplicação voltada para o gerenciamento de Ordens de Serviço para Relojoeiros, ajudando-os a organizar, otimizar e priorizar as demandas de seus clientes.
             </p>
-            <router-link to="/products" class="product-link">Saiba Mais</router-link>
+            <router-link to="/watch-sr" class="product-link">Saiba Mais</router-link>
           </div>
         </div>
+      </div>
+    </section>
+    <!-- Section 3: About Me -->
+    <section class="about-section">
+      <div class="container">
+        <h1>Sobre Mim</h1>
+        <p align="left">
+          Apesar de ter obtido meu primeiro curso superior em Bacharelado de Engenharia Mecânica (Unicamp, 1995), nunca atuei na área.<br />
+          Sou um "engenheiro não praticante".<br />
+          Minha primeira oportunidade profissional me foi oferecida há {{ yearsSinceMay1996 }} anos como Analista de Sistemas Sênior na ITAUSA, a <i>holding</i> controladora do Grupo Itaú.<br />
+          Lá fui treinado pelas melhores Solution Providers parceiras da Microsoft, para desenvolver soluções de software voltadas à Contabilidade.<br />
+          Graças a esse ponto de partida, acabei adotando a tecnologia Microsoft como minha principal stack tecnológica, embora também tenha experiência com outras tecnologias e linguagens de programação.<br />
+          Para me especializar cada vez mais, realizei mais dois cursos superiores: MBA em TI (FIAP, 2007) e CST em Análise e Desenvolvimento de Sistemas (Unifran, 2018).<br />
+          Você pode conhecer mais sobre minha trajetória profissional e minhas qualificações na minha <a href='https://www.linkedin.com/in/naio21' target="_blank" rel="noopener noreferrer">página do LinkedIn</a>,
+          ou através do meu currículo em <a href='/downloads/Ivan_Prado_CV.pdf'>português</a> ou <a href='/downloads/Ivan_Prado_Resume.pdf'>inglês</a>.
+        </p>
       </div>
     </section>
   </div>
 </template>
 
 <script>
+function calculateYearsFromMay1996() {
+  const startDate = new Date(1996, 4, 1)
+  const now = new Date()
+
+  const totalMonths = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth())
+  return Math.max(0, Math.floor(totalMonths / 12))
+}
+
 export default {
-  name: 'Home'
+  name: 'Home',
+  computed: {
+    yearsSinceMay1996() {
+      return calculateYearsFromMay1996()
+    }
+  }
 }
 </script>
+
+<style scoped>
+.about-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.about-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.about-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.about-section p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.about-section a {
+  color: #e0d7ff;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.about-section a:hover {
+  color: #ffffff;
+}
+</style>

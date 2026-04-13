@@ -22,12 +22,6 @@
         >
           Criar Conta
         </button>
-        <button 
-          :class="['tab-button', { active: activeTab === 'forgot' }]"
-          @click="activeTab = 'forgot'"
-        >
-          Esqueci minha Senha
-        </button>
       </div>
 
       <!-- Sign In Section -->
@@ -58,26 +52,8 @@
           <p class="message" :class="signInMessage.type" v-if="signInMessage.text">
             {{ signInMessage.text }}
           </p>
-        </form>
-      </div>
-
-      <!-- Forgot Password Section -->
-      <div v-if="activeTab === 'forgot'" class="auth-form">
-        <h2>Recuperar Senha</h2>
-        <form @submit.prevent="handleForgotPassword">
-          <div class="form-group">
-            <label for="forgot-email">E-mail:</label>
-            <input 
-              id="forgot-email"
-              v-model="forgotForm.email" 
-              type="email" 
-              required
-              placeholder="Digite seu e-mail para receber o link de recuperação"
-            >
-          </div>
-          <button type="submit" class="submit-button">Enviar Link de Recuperação</button>
-          <p class="message" :class="forgotMessage.type" v-if="forgotMessage.text">
-            {{ forgotMessage.text }}
+          <p class="forgot-link">
+            <router-link to="/forgot-password">Esqueci minha senha</router-link>
           </p>
         </form>
       </div>
@@ -198,9 +174,6 @@ export default {
         email: '',
         senha: ''
       },
-      forgotForm: {
-        email: ''
-      },
       signUpForm: {
         nome: '',
         documento: '',
@@ -211,10 +184,6 @@ export default {
         senha: ''
       },
       signInMessage: {
-        text: '',
-        type: ''
-      },
-      forgotMessage: {
         text: '',
         type: ''
       },
@@ -389,37 +358,6 @@ export default {
         console.error('Error:', error);
         this.signInMessage = {
           text: 'Erro ao realizar login. Tente novamente.',
-          type: 'error'
-        };
-      }
-    },
-    handleForgotPassword() {
-      try {
-        authService.recover(this.forgotForm.email)
-          .then(response => {
-            if (response.data?.status === true) {
-              this.forgotMessage = {
-                text: response.data.mensagem || 'E-mail de recuperação enviado com sucesso! Verifique sua caixa de entrada.',
-                type: 'success'
-              };
-            } else {
-              this.forgotMessage = {
-                text: response.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
-                type: 'error'
-              };
-            }
-          })
-          .catch(error => {
-            console.error('Forgot Password error:', error);
-            this.forgotMessage = {
-              text: error.response?.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
-              type: 'error'
-            };
-          });
-      } catch (error) {
-        console.error('Error:', error);
-        this.forgotMessage = {
-          text: error.response?.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
           type: 'error'
         };
       }

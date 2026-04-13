@@ -2,7 +2,7 @@
   <div class="contact-page">
     <div class="contact-container">
       <h1>Contato</h1>
-      <p>Preencha o formulário abaixo e entraremos em contato o mais breve possível.</p>
+      <p>Preencha o formulário abaixo e entraremos em contato o mais breve possível. Alternativamente, você pode acessar a <a href='https://www.linkedin.com/in/naio21' target="_blank" rel="noopener noreferrer">minha página do LinkedIn</a> e enviar uma mensagem diretamente por lá.</p>
 
       <form @submit.prevent="handleSubmit" class="contact-form">
         <div class="form-group">
@@ -77,7 +77,7 @@ export default {
       this.message = { text: '', type: '' };
 
       try {
-        await apiClient.post('/contact', {
+        await apiClient.post('/api/contact', {
           email: this.form.email,
           subject: this.form.subject,
           message: this.form.message
@@ -126,6 +126,7 @@ export default {
 .contact-container > p {
   margin-bottom: 2rem;
   color: rgba(255, 255, 255, 0.7);
+  text-align: justify;
 }
 
 .contact-form {

@@ -4,12 +4,13 @@ import App from './App.vue'
 import Home from './pages/Home.vue'
 import Auth from './pages/Auth.vue'
 import Activate from './pages/Activate.vue'
-import Products from './pages/Products.vue'
+import WatchSR from './pages/WatchSR.vue'
 import PrivacyPolicy from './pages/PrivacyPolicy.vue'
 import DataRetention from './pages/DataRetention.vue'
 import SubscribingPolicy from './pages/SubscribingPolicy.vue'
 import NotFound from './pages/404.vue'
 import Recover from './pages/Recover.vue'
+import ForgotPassword from './pages/ForgotPassword.vue'
 import Contact from './pages/Contact.vue'
 import { authService } from './service/authService'
 import './style.css'
@@ -36,10 +37,14 @@ const routes = [
     component: Recover
   },
   {
-    path: '/products',
-    name: 'Products',
-    component: Products,
-    meta: { requiresAuth: true }
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPassword
+  },
+  {
+    path: '/watch-sr',
+    name: 'WatchSR',
+    component: WatchSR
   },
   {
     path: '/contact',
@@ -74,7 +79,21 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+
+    if (to.hash) {
+      return {
+        el: to.hash,
+        top: 0
+      }
+    }
+
+    return { top: 0 }
+  }
 })
 
 // Navigation guard to check authentication
