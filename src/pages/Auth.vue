@@ -1,6 +1,14 @@
 <template>
   <div class="auth-page">
     <div class="auth-container">
+      <div class="auth-intro">
+        <h2>Acesso aos Produtos</h2>
+        <p>Para acessar nossos produtos e serviços, você precisa estar autenticado.<br />
+        Este passo é necessário para garantir a legalidade, segurança e integridade dos seus dados em nossa plataforma.<br />
+        Para mais informações sobre como utilizamos seus dados, consulte nossa <router-link to="/privacy-policy" class="link">Política de Privacidade</router-link>, <router-link to="/data-retention" class="link">Política de Retenção de Dados</router-link> e <router-link to="/subscribing-policy" class="link">Política de Assinatura</router-link>.<br />
+        Faça login ou cadastre-se caso ainda não possua uma conta.</p>
+      </div>
+
       <div class="auth-tabs">
         <button 
           :class="['tab-button', { active: activeTab === 'signin' }]"
@@ -13,12 +21,6 @@
           @click="activeTab = 'signup'"
         >
           Criar Conta
-        </button>
-        <button 
-          :class="['tab-button', { active: activeTab === 'forgot' }]"
-          @click="activeTab = 'forgot'"
-        >
-          Esqueci minha Senha
         </button>
       </div>
 
@@ -40,7 +42,7 @@
             <label for="signin-password">Senha:</label>
             <input 
               id="signin-password"
-              v-model="signInForm.password" 
+              v-model="signInForm.senha" 
               type="password" 
               required
               placeholder="Digite sua senha"
@@ -50,26 +52,8 @@
           <p class="message" :class="signInMessage.type" v-if="signInMessage.text">
             {{ signInMessage.text }}
           </p>
-        </form>
-      </div>
-
-      <!-- Forgot Password Section -->
-      <div v-if="activeTab === 'forgot'" class="auth-form">
-        <h2>Recuperar Senha</h2>
-        <form @submit.prevent="handleForgotPassword">
-          <div class="form-group">
-            <label for="forgot-email">E-mail:</label>
-            <input 
-              id="forgot-email"
-              v-model="forgotForm.email" 
-              type="email" 
-              required
-              placeholder="Digite seu e-mail para receber o link de recuperação"
-            >
-          </div>
-          <button type="submit" class="submit-button">Enviar Link de Recuperação</button>
-          <p class="message" :class="forgotMessage.type" v-if="forgotMessage.text">
-            {{ forgotMessage.text }}
+          <p class="forgot-link">
+            <router-link to="/forgot-password">Esqueci minha senha</router-link>
           </p>
         </form>
       </div>
@@ -84,9 +68,10 @@
               id="signup-nome"
               v-model="signUpForm.nome" 
               type="text" 
-              required
               placeholder="Digite seu nome completo"
+              @blur="validateNome"
             >
+            <p class="error-message" v-if="nomeError">{{ nomeError }}</p>
           </div>
 
           <div class="form-group">
@@ -95,9 +80,9 @@
               id="signup-documento"
               v-model="signUpForm.documento" 
               type="text" 
-              required
               placeholder="000.000.000-00 ou 00.000.000/0000-00"
               maxlength="18"
+              @input="maskDocumento"
               @blur="validateDocumento"
             >
             <p class="error-message" v-if="documentoError">{{ documentoError }}</p>
@@ -109,11 +94,12 @@
               id="signup-telefone"
               v-model="signUpForm.telefone" 
               type="tel" 
-              required
               placeholder="(11) 98765-4321"
               maxlength="15"
               @input="maskPhoneNumber"
+              @blur="validateTelefone"
             >
+            <p class="error-message" v-if="telefoneError">{{ telefoneError }}</p>
           </div>
 
           <div class="form-group">
@@ -122,9 +108,10 @@
               id="signup-razao"
               v-model="signUpForm.razaoSocial" 
               type="text" 
-              required
               placeholder="Razão Social da sua empresa"
+              @blur="validateRazaoSocial"
             >
+            <p class="error-message" v-if="razaoSocialError">{{ razaoSocialError }}</p>
           </div>
 
           <div class="form-group">
@@ -133,7 +120,6 @@
               id="signup-fantasia"
               v-model="signUpForm.nomeFantasia" 
               type="text" 
-              required
               placeholder="Nome Fantasia da sua empresa"
             >
           </div>
@@ -144,9 +130,10 @@
               id="signup-email"
               v-model="signUpForm.email" 
               type="email" 
-              required
               placeholder="seu.email@example.com"
+              @blur="validateEmail"
             >
+            <p class="error-message" v-if="emailError">{{ emailError }}</p>
           </div>
 
           <div class="form-group">
@@ -155,12 +142,13 @@
               id="signup-senha"
               v-model="signUpForm.senha" 
               type="password" 
-              required
               placeholder="Crie uma senha segura"
+              @blur="validateSenha"
             >
+            <p class="error-message" v-if="senhaError">{{ senhaError }}</p>
           </div>
 
-          <button type="submit" class="submit-button" :disabled="isSubmitting">
+          <button type="submit" class="submit-button" :disabled="isSubmitting || signUpSuccess">
             {{ isSubmitting ? 'Criando Conta...' : 'Criar Conta' }}
           </button>
           <p class="message" :class="signUpMessage.type" v-if="signUpMessage.text">
@@ -184,10 +172,7 @@ export default {
       isSubmitting: false,
       signInForm: {
         email: '',
-        password: ''
-      },
-      forgotForm: {
-        email: ''
+        senha: ''
       },
       signUpForm: {
         nome: '',
@@ -202,25 +187,38 @@ export default {
         text: '',
         type: ''
       },
-      forgotMessage: {
-        text: '',
-        type: ''
-      },
       signUpMessage: {
         text: '',
         type: ''
       },
+      signUpSuccess: false,
+      nomeError: '',
+      telefoneError: '',
+      razaoSocialError: '',
+      emailError: '',
+      senhaError: '',
       documentoError: ''
     }
   },
   methods: {
+    maskDocumento(event) {
+      let value = event.target.value.replace(/\D/g, '');
+      let masked = '';
+
+      if (value.length === 11) {
+        // CPF format: XXX.XXX.XXX-XX
+        masked = value.slice(0, 3) + '.' + value.slice(3, 6) + '.' + value.slice(6, 9) + '-' + value.slice(9);
+      } else if (value.length === 14) {
+        // CNPJ format: XX.XXX.XXX/XXXX-XX
+        masked = value.slice(0, 2) + '.' + value.slice(2, 5) + '.' + value.slice(5, 8) + '/' + value.slice(8, 12) + '-' + value.slice(12);
+      } else {
+        masked = value;
+      }
+
+      this.signUpForm.documento = masked;
+    },
     validateDocumento() {
       const documento = this.signUpForm.documento.replace(/\D/g, '');
-      
-      if (!documento) {
-        this.documentoError = 'Documento é obrigatório.';
-        return false;
-      }
       
       if (documento.length === 11) {
         if (!isCPF(documento)) {
@@ -240,26 +238,119 @@ export default {
       this.documentoError = '';
       return true;
     },
+    validateNome() {
+      const nome = this.signUpForm.nome.trim();
+      
+      if (!nome) {
+        this.nomeError = 'Nome é obrigatório.';
+        return false;
+      }
+      
+      if (nome.length < 3) {
+        this.nomeError = 'Nome deve ter no mínimo 3 caracteres.';
+        return false;
+      }
+      
+      this.nomeError = '';
+      return true;
+    },
+    validateTelefone() {
+      const telefone = this.signUpForm.telefone.replace(/\D/g, '');
+      
+      if (!telefone) {
+        this.telefoneError = 'Telefone é obrigatório.';
+        return false;
+      }
+      
+      if (telefone.length < 10 || telefone.length > 11) {
+        this.telefoneError = 'Telefone deve ter 10 ou 11 dígitos.';
+        return false;
+      }
+      
+      this.telefoneError = '';
+      return true;
+    },
+    validateRazaoSocial() {
+      const razaoSocial = this.signUpForm.razaoSocial.trim();
+      
+      if (!razaoSocial) {
+        this.razaoSocialError = 'Razão Social é obrigatória.';
+        return false;
+      }
+      
+      if (razaoSocial.length < 3) {
+        this.razaoSocialError = 'Razão Social deve ter no mínimo 3 caracteres.';
+        return false;
+      }
+      
+      this.razaoSocialError = '';
+      return true;
+    },
+    validateEmail() {
+      const email = this.signUpForm.email.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (!email) {
+        this.emailError = 'E-mail é obrigatório.';
+        return false;
+      }
+      
+      if (!emailRegex.test(email)) {
+        this.emailError = 'E-mail inválido.';
+        return false;
+      }
+      
+      this.emailError = '';
+      return true;
+    },
+    validateSenha() {
+      const senha = this.signUpForm.senha;
+      
+      if (!senha) {
+        this.senhaError = 'Senha é obrigatória.';
+        return false;
+      }
+      
+      if (senha.length < 6) {
+        this.senhaError = 'Senha deve ter no mínimo 6 caracteres.';
+        return false;
+      }
+      
+      this.senhaError = '';
+      return true;
+    },
     handleSignIn() {
       try {
-        authService.login(this.signInForm.email, this.signInForm.password)
+        authService.login(this.signInForm.email, this.signInForm.senha)
           .then(response => {
-            if (response.data.token) {
-              authService.setToken(response.data.token);
+            // API returns token in response.data.dados (lowercase)
+            const token = response.data?.dados;
+            
+            if (token) {
+              authService.setToken(token);
               this.signInMessage = {
                 text: 'Login realizado com sucesso!',
                 type: 'success'
               };
-              // Redirect to home after 2 seconds
+              // Redirect to the originally requested page or home after 2 seconds
               setTimeout(() => {
-                this.$router.push('/');
+                const redirectPath = sessionStorage.getItem('redirectPath');
+                sessionStorage.removeItem('redirectPath');
+                const redirectTo = redirectPath || '/';
+                this.$router.push(redirectTo);
               }, 2000);
+            } else {
+              console.warn('No token found in response:', response.data);
+              this.signInMessage = {
+                text: 'Resposta do servidor inválida. Tente novamente.',
+                type: 'error'
+              };
             }
           })
           .catch(error => {
             console.error('Login error:', error);
             this.signInMessage = {
-              text: error.response?.data?.message || 'E-mail ou senha inválidos.',
+              text: error.response?.data?.mensagem || 'E-mail ou senha inválidos.',
               type: 'error'
             };
           });
@@ -271,29 +362,21 @@ export default {
         };
       }
     },
-    handleForgotPassword() {
-      // TODO: Implement forgot password endpoint with your API
-      // Your current API doesn't have a forgot password endpoint visible in Swagger
-      // You'll need to configure this with your backend
-      console.log('Forgot Password:', this.forgotForm);
-      this.forgotMessage = {
-        text: 'Funcionalidade de recuperação de senha será implementada em breve.',
-        type: 'info'
-      };
-      setTimeout(() => {
-        this.forgotForm.email = '';
-        this.forgotMessage = { text: '', type: '' };
-      }, 3000);
-    },
     async handleSignUp() {
-      if (!this.validateDocumento()) {
+      // Validate all fields
+      if (!this.validateNome() || 
+          !this.validateDocumento() || 
+          !this.validateTelefone() || 
+          !this.validateRazaoSocial() || 
+          !this.validateEmail() || 
+          !this.validateSenha()) {
         return;
       }
 
       this.isSubmitting = true;
       try {
-        // Map form data to API schema
-        const clientData = {
+        // Map form data to RegisterModel structure
+        const signUpData = {
           nome: this.signUpForm.nome,
           documento: this.signUpForm.documento.replace(/\D/g, ''),
           telefone: this.signUpForm.telefone,
@@ -303,24 +386,26 @@ export default {
           senha: this.signUpForm.senha
         };
 
-        const response = await authService.signup(clientData);
+        const response = await authService.signup(signUpData);
 
-        if (response.status === 200 || response.status === 201) {
+        // Check if registration was successful
+        if (response.data?.status === true) {
+          this.signUpSuccess = true;
           this.signUpMessage = {
-            text: 'Conta criada com sucesso! Redirecionando...',
+            text: 'Conta criada com sucesso! Verifique seu e-mail para ativar a conta.',
             type: 'success'
           };
-          // Reset form
-          this.resetSignUpForm();
-          // Redirect to home after 2 seconds
-          setTimeout(() => {
-            this.$router.push('/');
-          }, 2000);
+        } else {
+          this.signUpMessage = {
+            text: response.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.',
+            type: 'error'
+          };
         }
       } catch (error) {
         console.error('Signup error:', error);
+        const errorMessage = error.response?.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.';
         this.signUpMessage = {
-          text: error.response?.data?.message || 'Erro ao criar a conta. Por favor, tente novamente.',
+          text: errorMessage,
           type: 'error'
         };
       } finally {
@@ -352,6 +437,13 @@ export default {
         email: '',
         senha: ''
       };
+      // Clear all error messages
+      this.nomeError = '';
+      this.documentoError = '';
+      this.telefoneError = '';
+      this.razaoSocialError = '';
+      this.emailError = '';
+      this.senhaError = '';
     }
   }
 }
