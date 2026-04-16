@@ -9,10 +9,19 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'NotFound'
-}
+<script setup>
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Página Não Encontrada - ibpsys',
+  meta: [
+    { name: 'description', content: 'A página que você está procurando não existe ou foi removida.' },
+    { property: 'og:title', content: '404 - Página Não Encontrada' },
+    { property: 'og:description', content: 'A página que você está procurando não existe ou foi removida.' }
+  ]
+})
+
+defineOptions({ name: 'NotFound' })
 </script>
 
 <style scoped>

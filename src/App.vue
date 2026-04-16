@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="app-shell">
     <div id="top"></div>
     <!-- Token Expiration Warning -->
     <div v-if="showExpiryWarning" class="expiry-warning">

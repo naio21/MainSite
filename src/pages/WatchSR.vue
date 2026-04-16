@@ -38,8 +38,8 @@
           Para baixar o instalador, você precisa se cadastrar ou se autenticar.
           <router-link to="/auth">Faça login ou crie uma conta</router-link> para continuar.
         </p>
-        <h2>Sugestões de Fornituras</h2>
-        <p>Você, profissional relojoeiro, precisa de novas ferramentas, maquinário ou peças de reposição para relógios mais antigos? Veja a seguir algumas sugestões de Fornituras para facilitar o seu trabalho.</p>
+        <h2>Sugestões de Fornituras e Serviços Relacionados</h2>
+        <p>Você, profissional relojoeiro, precisa de novas ferramentas, maquinário ou peças de reposição para relógios mais antigos? Veja a seguir algumas sugestões para facilitar o seu trabalho.</p>
         <!-- Google AdSense ad unit -->
         <ins class="adsbygoogle"
              style="display:block"
@@ -57,6 +57,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { authService } from '../service/authService'
+import { useHead } from '@unhead/vue'
 
 const isAuthenticated = ref(authService.isAuthenticated())
 
@@ -66,6 +67,16 @@ onMounted(() => {
     } catch (e) {
         console.error("AdSense error:", e);
     }
+})
+
+useHead({
+  title: 'Watch SR - ibpsys',
+  meta: [
+    { name: 'description', content: 'Conheça o Watch SR, um sistema completo para gerenciamento de Ordens de Serviço para Relojoeiros. Mantenha suas demandas organizadas, otimize seu fluxo de trabalho e priorize seus atendimentos com facilidade.' },
+    { property: 'og:title', content: 'Watch SR - ibpsys' },
+    { property: 'og:description', content: 'Conheça o Watch SR, um sistema completo para gerenciamento de Ordens de Serviço para Relojoeiros. Mantenha suas demandas organizadas, otimize seu fluxo de trabalho e priorize seus atendimentos com facilidade.' },
+    { name: 'keywords', content: 'Watch SR, sistema de ordens de serviço, relojoeiros, gerenciamento de demandas, otimização de fluxo de trabalho, organização de tarefas' }
+  ]
 })
 </script>
 

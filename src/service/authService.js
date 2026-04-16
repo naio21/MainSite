@@ -3,6 +3,7 @@ import apiClient from './api';
 const TOKEN_KEY = 'authToken';
 const TOKEN_EXPIRY_KEY = 'authTokenExpiry';
 const TOKEN_EXPIRY_DAYS = 14;
+const hasStorage = () => typeof window !== 'undefined' && typeof localStorage !== 'undefined';
 
 export const authService = {
   login(email, senha) {
@@ -35,21 +36,21 @@ recover(email) {
   },
 
   logout() {
+    if (!hasStorage()) return;
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(TOKEN_EXPIRY_KEY);
   },
 
   setToken(token) {
-    // Store token
+    if (!hasStorage()) return;
     localStorage.setItem(TOKEN_KEY, token);
-    
-    // Calculate expiration time (14 days from now)
+
     const expiryTime = new Date().getTime() + (TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
     localStorage.setItem(TOKEN_EXPIRY_KEY, expiryTime);
   },
 
   getToken() {
-    // Check if token is expired
+    if (!hasStorage()) return null;
     if (this.isTokenExpired()) {
       this.logout();
       return null;
@@ -62,6 +63,9 @@ recover(email) {
   },
 
   isTokenExpired() {
+    if (!hasStorage()) {
+      return true;
+    }
     const expiryTime = localStorage.getItem(TOKEN_EXPIRY_KEY);
     if (!expiryTime) {
       return true;
@@ -70,6 +74,9 @@ recover(email) {
   },
 
   getTokenExpiryTime() {
+    if (!hasStorage()) {
+      return null;
+    }
     const expiryTime = localStorage.getItem(TOKEN_EXPIRY_KEY);
     if (!expiryTime) {
       return null;
@@ -78,6 +85,9 @@ recover(email) {
   },
 
   getRemainingTime() {
+    if (!hasStorage()) {
+      return 0;
+    }
     const expiryTime = localStorage.getItem(TOKEN_EXPIRY_KEY);
     if (!expiryTime) {
       return 0;

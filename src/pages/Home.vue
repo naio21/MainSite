@@ -37,9 +37,9 @@
         <p align="left">
           Apesar de ter obtido meu primeiro curso superior em Bacharelado de Engenharia Mecânica (Unicamp, 1995), nunca atuei na área.<br />
           Sou um "engenheiro não praticante".<br />
-          Minha primeira oportunidade profissional me foi oferecida há {{ yearsSinceMay1996 }} anos como Analista de Sistemas Sênior na ITAUSA, a <i>holding</i> controladora do Grupo Itaú.<br />
-          Lá fui treinado pelas melhores Solution Providers parceiras da Microsoft, para desenvolver soluções de software voltadas à Contabilidade.<br />
-          Graças a esse ponto de partida, acabei adotando a tecnologia Microsoft como minha principal stack tecnológica, embora também tenha experiência com outras tecnologias e linguagens de programação.<br />
+          Minha primeira oportunidade profissional foi oferecida há {{ yearsSinceMay1996 }} anos como Analista de Sistemas Sênior na ITAUSA, a <i>holding</i> controladora do Grupo Itaú.<br />
+          Lá fui treinado pelas melhores Solution Providers parceiras da Microsoft, para desenvolver soluções de software voltadas à Superintendência de Contabilidade.<br />
+          Graças a esse ponto de partida, acabei adotando a tecnologia Microsoft como minha principal <i>stack</i>, embora também tenha experiência com outras tecnologias e linguagens de programação.<br />
           Para me especializar cada vez mais, realizei mais dois cursos superiores: MBA em TI (FIAP, 2007) e CST em Análise e Desenvolvimento de Sistemas (Unifran, 2018).<br />
           Você pode conhecer mais sobre minha trajetória profissional e minhas qualificações na minha <a href='https://www.linkedin.com/in/naio21' target="_blank" rel="noopener noreferrer">página do LinkedIn</a>,
           ou através do meu currículo em <a href='/downloads/Ivan_Prado_CV.pdf'>português</a> ou <a href='/downloads/Ivan_Prado_Resume.pdf'>inglês</a>.
@@ -48,6 +48,19 @@
     </section>
   </div>
 </template>
+
+<script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'Home - ibpsys',
+  meta: [
+    { name: 'description', content: 'Bem vindo à ibpsys, soluções inovadoras para empresas e profissionais autônomos.' },
+    { property: 'og:title', content: 'Home - ibpsys' },
+    { property: 'og:description', content: 'Bem vindo à ibpsys, soluções inovadoras para empresas e profissionais autônomos.' },
+    { name: 'keywords', content: 'ibpsys, soluções, sistemas para relojoeiros, negócios, tecnologia, Microsoft .NET, Vue.js' }
+  ]
+})
+</script>
 
 <script>
 function calculateYearsFromMay1996() {

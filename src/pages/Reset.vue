@@ -1,14 +1,14 @@
 <template>
-  <div class="recover-page">
-    <div class="recover-container">
+  <div class="reset-page">
+    <div class="reset-container">
       <!-- Loading State -->
-      <div v-if="loading" class="recover-content">
+      <div v-if="loading" class="reset-content">
         <h2>Aguarde...</h2>
         <div class="spinner"></div>
       </div>
 
       <!-- Success State -->
-      <div v-else-if="success" class="recover-content success">
+      <div v-else-if="success" class="reset-content success">
         <div class="success-icon">✓</div>
         <h2>Senha Redefinida!</h2>
         <p>Sua senha foi alterada com sucesso.</p>
@@ -17,10 +17,10 @@
       </div>
 
       <!-- Form State -->
-      <div v-else class="recover-content">
+      <div v-else class="reset-content">
         <h2>Redefinir Senha</h2>
-        <p class="recover-subtitle">Digite e confirme sua nova senha abaixo.</p>
-        <form @submit.prevent="handleRecover">
+        <p class="reset-subtitle">Digite e confirme sua nova senha abaixo.</p>
+        <form @submit.prevent="handleReset">
           <div class="form-group">
             <label for="new-password">Nova Senha:</label>
             <input
@@ -56,10 +56,22 @@
 </template>
 
 <script>
+import { useHead } from '@unhead/vue';
 import apiClient from '../service/api';
 
 export default {
-  name: 'Recover',
+  name: 'Reset',
+  setup() {
+    useHead({
+      title: 'Redefinir Senha - ibpsys',
+      meta: [
+        { name: 'description', content: 'Defina uma nova senha para recuperar o acesso à sua conta ibpsys com segurança.' },
+        { name: 'keywords', content: 'redefinir senha, recuperação de conta, ibpsys, segurança, autenticação' },
+        { property: 'og:title', content: 'Redefinir Senha - ibpsys' },
+        { property: 'og:description', content: 'Defina uma nova senha para recuperar o acesso à sua conta ibpsys com segurança.' }
+      ]
+    });
+  },
   data() {
     return {
       loading: false,
@@ -111,7 +123,7 @@ export default {
       this.errors.confirmPassword = '';
       return true;
     },
-    async handleRecover() {
+    async handleReset() {
       if (!this.validateNewPassword() | !this.validateConfirmPassword()) {
         return;
       }
@@ -120,9 +132,9 @@ export default {
       this.message = { text: '', type: '' };
 
       try {
-        await apiClient.post('/api/Authentication/reset-password', {
-          id: this.encryptedId,
-          novaSenha: this.form.newPassword
+        await apiClient.post('/api/Authentication/reset', {
+          EncryptedId: this.encryptedId,
+          NewPassword: this.form.newPassword
         });
 
         this.success = true;
@@ -131,7 +143,7 @@ export default {
           text: err.response?.data?.mensagem || 'Erro ao redefinir a senha. Tente novamente.',
           type: 'error'
         };
-        console.error('Recover error:', err);
+        console.error('Reset error:', err);
       } finally {
         this.submitting = false;
       }
@@ -141,16 +153,16 @@ export default {
 </script>
 
 <style scoped>
-.recover-page {
+.reset-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
 }
 
-.recover-container {
+.reset-container {
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -159,19 +171,19 @@ export default {
   overflow: hidden;
 }
 
-.recover-content {
+.reset-content {
   padding: 2.5rem 2rem;
   text-align: center;
   color: #333;
 }
 
-.recover-content h2 {
+.reset-content h2 {
   font-size: 1.75rem;
   margin: 0 0 0.5rem;
   color: #333;
 }
 
-.recover-subtitle {
+.reset-subtitle {
   color: #666;
   margin-bottom: 1.5rem;
 }

@@ -52,61 +52,57 @@
   </div>
 </template>
 
-<script>
-import apiClient from '../service/api';
+<script setup>
+import { ref } from 'vue'
+import apiClient from '../service/api'
+import { useHead } from '@unhead/vue'
 
-export default {
-  name: 'Contact',
-  data() {
-    return {
-      form: {
-        email: '',
-        subject: '',
-        message: ''
-      },
-      isSubmitting: false,
-      message: {
-        text: '',
-        type: ''
+defineOptions({ name: 'Contact' })
+
+const form = ref({ email: '', subject: '', message: '' })
+const isSubmitting = ref(false)
+const message = ref({ text: '', type: '' })
+
+async function handleSubmit() {
+  isSubmitting.value = true
+  message.value = { text: '', type: '' }
+  try {
+    await apiClient.post('/api/contact', {
+      email: form.value.email,
+      subject: form.value.subject,
+      message: form.value.message
+    })
+    message.value = {
+      text: 'Mensagem enviada com sucesso! Em breve entraremos em contato.',
+      type: 'success'
+    }
+    form.value = { email: '', subject: '', message: '' }
+  } catch (error) {
+    const status = error.response?.status
+    if (status === 429) {
+      message.value = {
+        text: 'Muitas tentativas. Por favor, aguarde alguns minutos antes de tentar novamente.',
+        type: 'error'
       }
-    };
-  },
-  methods: {
-    async handleSubmit() {
-      this.isSubmitting = true;
-      this.message = { text: '', type: '' };
-
-      try {
-        await apiClient.post('/api/contact', {
-          email: this.form.email,
-          subject: this.form.subject,
-          message: this.form.message
-        });
-
-        this.message = {
-          text: 'Mensagem enviada com sucesso! Em breve entraremos em contato.',
-          type: 'success'
-        };
-        this.form = { email: '', subject: '', message: '' };
-      } catch (error) {
-        const status = error.response?.status;
-        if (status === 429) {
-          this.message = {
-            text: 'Muitas tentativas. Por favor, aguarde alguns minutos antes de tentar novamente.',
-            type: 'error'
-          };
-        } else {
-          this.message = {
-            text: 'Erro ao enviar a mensagem. Por favor, tente novamente mais tarde.',
-            type: 'error'
-          };
-        }
-      } finally {
-        this.isSubmitting = false;
+    } else {
+      message.value = {
+        text: 'Erro ao enviar a mensagem. Por favor, tente novamente mais tarde.',
+        type: 'error'
       }
     }
+  } finally {
+    isSubmitting.value = false
   }
-};
+}
+
+useHead({
+  title: 'Contato - ibpsys',
+  meta: [
+    { name: 'description', content: 'Entre em contato conosco para dúvidas, sugestões ou suporte.' },
+    { property: 'og:title', content: 'Contato - ibpsys' },
+    { property: 'og:description', content: 'Entre em contato conosco para dúvidas, sugestões ou suporte.' }
+  ]
+})
 </script>
 
 <style scoped>

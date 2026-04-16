@@ -90,12 +90,23 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 
 const router = useRouter()
 
 function goBack() {
   router.back()
 }
+
+useHead({
+  title: 'Política de Privacidade - ibpsys',
+  meta: [
+    { name: 'description', content: 'Leia a política de privacidade da ibpsys, garantindo a proteção de seus dados e informações pessoais.' },
+    { property: 'og:title', content: 'Política de Privacidade - ibpsys' },
+    { property: 'og:description', content: 'Leia a política de privacidade da ibpsys, garantindo a proteção de seus dados e informações pessoais.' },
+    { name: 'keywords', content: 'ibpsys, privacidade, política de privacidade, proteção de dados, segurança, informações pessoais' }
+  ]
+})
 </script>
 
 <style scoped>
