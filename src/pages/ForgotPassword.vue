@@ -30,53 +30,58 @@
   </div>
 </template>
 
-<script>
-import { authService } from '../service/authService';
+<script setup>
+import { ref } from 'vue'
+import { useHead } from '@unhead/vue'
+import { authService } from '../service/authService'
 
-export default {
-  name: 'ForgotPassword',
-  data() {
-    return {
-      email: '',
-      submitting: false,
-      message: {
-        text: '',
-        type: ''
+defineOptions({ name: 'ForgotPassword' })
+
+const email = ref('')
+const submitting = ref(false)
+const message = ref({
+  text: '',
+  type: ''
+})
+
+function handleForgotPassword() {
+  submitting.value = true
+  message.value = { text: '', type: '' }
+
+  authService.recover(email.value)
+    .then(response => {
+      if (response.data?.status === true) {
+        message.value = {
+          text: response.data.mensagem || 'E-mail de recuperação enviado com sucesso! Verifique sua caixa de entrada.',
+          type: 'success'
+        }
+      } else {
+        message.value = {
+          text: response.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
+          type: 'error'
+        }
       }
-    };
-  },
-  methods: {
-    handleForgotPassword() {
-      this.submitting = true;
-      this.message = { text: '', type: '' };
+    })
+    .catch(error => {
+      console.error('Forgot Password error:', error)
+      message.value = {
+        text: error.response?.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
+        type: 'error'
+      }
+    })
+    .finally(() => {
+      submitting.value = false
+    })
+}
 
-      authService.recover(this.email)
-        .then(response => {
-          if (response.data?.status === true) {
-            this.message = {
-              text: response.data.mensagem || 'E-mail de recuperação enviado com sucesso! Verifique sua caixa de entrada.',
-              type: 'success'
-            };
-          } else {
-            this.message = {
-              text: response.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
-              type: 'error'
-            };
-          }
-        })
-        .catch(error => {
-          console.error('Forgot Password error:', error);
-          this.message = {
-            text: error.response?.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',
-            type: 'error'
-          };
-        })
-        .finally(() => {
-          this.submitting = false;
-        });
-    }
-  }
-};
+useHead({
+  title: 'Recuperar Senha - ibpsys',
+  meta: [
+    { name: 'description', content: 'Recupere sua senha de acesso à plataforma ibpsys de forma rápida e segura.' },
+    { property: 'og:title', content: 'Recuperar Senha - ibpsys' },
+    { property: 'og:description', content: 'Recupere sua senha de acesso à plataforma ibpsys de forma rápida e segura.' }
+  ]
+})
 </script>
 
 <style scoped>

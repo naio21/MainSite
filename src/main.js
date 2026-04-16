@@ -9,7 +9,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy.vue'
 import DataRetention from './pages/DataRetention.vue'
 import SubscribingPolicy from './pages/SubscribingPolicy.vue'
 import NotFound from './pages/404.vue'
-import Recover from './pages/Recover.vue'
+import Reset from './pages/Reset.vue'
 import ForgotPassword from './pages/ForgotPassword.vue'
 import Contact from './pages/Contact.vue'
 import { authService } from './service/authService'
@@ -32,9 +32,9 @@ const routes = [
     component: Activate
   },
   {
-    path: '/recover',
-    name: 'Recover',
-    component: Recover
+    path: '/reset',
+    name: 'Reset',
+    component: Reset
   },
   {
     path: '/forgot-password',

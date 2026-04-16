@@ -15,10 +15,21 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 
 const router = useRouter()
 
 function goBack() {
   router.back()
 }
+
+useHead({
+  title: 'Política de Assinatura - ibpsys',
+  meta: [
+    { name: 'description', content: 'Confira a política de assinatura dos sistemas e saiba como funciona o período de degustação e os planos disponíveis.' },
+    { property: 'og:title', content: 'Política de Assinatura - ibpsys' },
+    { property: 'og:description', content: 'Confira a política de assinatura dos sistemas e saiba como funciona o período de degustação e os planos disponíveis.' }
+  ]
+})
+
 </script>

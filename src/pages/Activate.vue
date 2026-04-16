@@ -31,64 +31,73 @@
   </div>
 </template>
 
-<script>
-import apiClient from '../service/api';
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import apiClient from '../service/api'
+import { useHead } from '@unhead/vue'
 
-export default {
-  name: 'Activate',
-  data() {
-    return {
-      loading: true,
-      success: false,
-      error: false,
-      errorMessage: 'Ocorreu um erro ao ativar sua conta. Por favor, tente novamente mais tarde.',
-      errorDetails: null,
-      activationId: null
+defineOptions({ name: 'Activate' })
+
+const loading = ref(true)
+const success = ref(false)
+const error = ref(false)
+const errorMessage = ref('Ocorreu um erro ao ativar sua conta. Por favor, tente novamente mais tarde.')
+const errorDetails = ref(null)
+const activationId = ref(null)
+
+const route = useRoute()
+const router = useRouter()
+
+async function processActivation() {
+  try {
+    // Extract 'id' from query parameters
+    activationId.value = route.query.id
+
+    // Validate that we have an activation ID
+    if (!activationId.value) {
+      router.replace('/404')
+      return
     }
-  },
-  mounted() {
-    this.processActivation();
-  },
-  methods: {
-    async processActivation() {
-      try {
-        // Extract 'id' from query parameters
-        this.activationId = this.$route.query.id;
 
-        // Validate that we have an activation ID
-        if (!this.activationId) {
-          this.$router.replace('/404');
-          return;
-        }
-
-        // Call the activation endpoint
-        await apiClient.post('/api/authentication/activate', null, {
-          params: {
-            id: this.activationId
-          }
-        });
-
-        // Success
-        this.loading = false;
-        this.success = true;
-      } catch (err) {
-        this.loading = false;
-        this.error = true;
-
-        // Extract error message from API response
-        if (err.response?.data?.message) {
-          this.errorMessage = err.response.data.message;
-        } else if (err.response?.data) {
-          // If response has other error info
-          this.errorDetails = JSON.stringify(err.response.data);
-        } else if (err.message) {
-          this.errorMessage = err.message;
-        }
-
-        console.error('Activation error:', err);
+    // Call the activation endpoint
+    await apiClient.post('/api/authentication/activate', null, {
+      params: {
+        id: activationId.value
       }
+    })
+
+    // Success
+    loading.value = false
+    success.value = true
+  } catch (err) {
+    loading.value = false
+    error.value = true
+
+    // Extract error message from API response
+    if (err.response?.data?.message) {
+      errorMessage.value = err.response.data.message
+    } else if (err.response?.data) {
+      errorDetails.value = JSON.stringify(err.response.data)
+    } else if (err.message) {
+      errorMessage.value = err.message
     }
+
+    console.error('Activation error:', err)
   }
 }
+
+onMounted(() => {
+  processActivation()
+})
+
+useHead({
+  title: 'Ativação de Conta - ibpsys',
+  meta: [
+    { name: 'description', content: 'Ative sua conta ibpsys para acessar todos os recursos da plataforma.' },
+    { property: 'og:title', content: 'Ativação de Conta - ibpsys' },
+    { property: 'og:description', content: 'Ative sua conta ibpsys para acessar todos os recursos da plataforma.' }
+  ]
+})
 </script>
 

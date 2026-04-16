@@ -160,291 +160,261 @@
   </div>
 </template>
 
-<script>
-import { isCNPJ, isCPF } from 'validation-br';
-import { authService } from '../service/authService';
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { isCNPJ, isCPF } from 'validation-br'
+import { authService } from '../service/authService'
+import { useHead } from '@unhead/vue'
 
-export default {
-  name: 'Auth',
-  data() {
-    return {
-      activeTab: 'signin',
-      isSubmitting: false,
-      signInForm: {
-        email: '',
-        senha: ''
-      },
-      signUpForm: {
-        nome: '',
-        documento: '',
-        telefone: '',
-        razaoSocial: '',
-        nomeFantasia: '',
-        email: '',
-        senha: ''
-      },
-      signInMessage: {
-        text: '',
-        type: ''
-      },
-      signUpMessage: {
-        text: '',
-        type: ''
-      },
-      signUpSuccess: false,
-      nomeError: '',
-      telefoneError: '',
-      razaoSocialError: '',
-      emailError: '',
-      senhaError: '',
-      documentoError: ''
+defineOptions({ name: 'Auth' })
+
+const router = useRouter()
+const activeTab = ref('signin')
+const isSubmitting = ref(false)
+const signInForm = ref({ email: '', senha: '' })
+const signUpForm = ref({
+  nome: '',
+  documento: '',
+  telefone: '',
+  razaoSocial: '',
+  nomeFantasia: '',
+  email: '',
+  senha: ''
+})
+const signInMessage = ref({ text: '', type: '' })
+const signUpMessage = ref({ text: '', type: '' })
+const signUpSuccess = ref(false)
+const nomeError = ref('')
+const telefoneError = ref('')
+const razaoSocialError = ref('')
+const emailError = ref('')
+const senhaError = ref('')
+const documentoError = ref('')
+
+function maskDocumento(event) {
+  let value = event.target.value.replace(/\D/g, '')
+  let masked = ''
+  if (value.length === 11) {
+    masked = value.slice(0, 3) + '.' + value.slice(3, 6) + '.' + value.slice(6, 9) + '-' + value.slice(9)
+  } else if (value.length === 14) {
+    masked = value.slice(0, 2) + '.' + value.slice(2, 5) + '.' + value.slice(5, 8) + '/' + value.slice(8, 12) + '-' + value.slice(12)
+  } else {
+    masked = value
+  }
+  signUpForm.value.documento = masked
+}
+
+function validateDocumento() {
+  const documento = signUpForm.value.documento.replace(/\D/g, '')
+  if (documento.length === 11) {
+    if (!isCPF(documento)) {
+      documentoError.value = 'CPF inválido.'
+      return false
     }
-  },
-  methods: {
-    maskDocumento(event) {
-      let value = event.target.value.replace(/\D/g, '');
-      let masked = '';
+  } else if (documento.length === 14) {
+    if (!isCNPJ(documento)) {
+      documentoError.value = 'CNPJ inválido.'
+      return false
+    }
+  } else {
+    documentoError.value = 'Documento deve ter 11 dígitos (CPF) ou 14 dígitos (CNPJ).'
+    return false
+  }
+  documentoError.value = ''
+  return true
+}
 
-      if (value.length === 11) {
-        // CPF format: XXX.XXX.XXX-XX
-        masked = value.slice(0, 3) + '.' + value.slice(3, 6) + '.' + value.slice(6, 9) + '-' + value.slice(9);
-      } else if (value.length === 14) {
-        // CNPJ format: XX.XXX.XXX/XXXX-XX
-        masked = value.slice(0, 2) + '.' + value.slice(2, 5) + '.' + value.slice(5, 8) + '/' + value.slice(8, 12) + '-' + value.slice(12);
-      } else {
-        masked = value;
-      }
+function validateNome() {
+  const nome = signUpForm.value.nome.trim()
+  if (!nome) {
+    nomeError.value = 'Nome é obrigatório.'
+    return false
+  }
+  if (nome.length < 3) {
+    nomeError.value = 'Nome deve ter no mínimo 3 caracteres.'
+    return false
+  }
+  nomeError.value = ''
+  return true
+}
 
-      this.signUpForm.documento = masked;
-    },
-    validateDocumento() {
-      const documento = this.signUpForm.documento.replace(/\D/g, '');
-      
-      if (documento.length === 11) {
-        if (!isCPF(documento)) {
-          this.documentoError = 'CPF inválido.';
-          return false;
-        }
-      } else if (documento.length === 14) {
-        if (!isCNPJ(documento)) {
-          this.documentoError = 'CNPJ inválido.';
-          return false;
-        }
-      } else {
-        this.documentoError = 'Documento deve ter 11 dígitos (CPF) ou 14 dígitos (CNPJ).';
-        return false;
-      }
-      
-      this.documentoError = '';
-      return true;
-    },
-    validateNome() {
-      const nome = this.signUpForm.nome.trim();
-      
-      if (!nome) {
-        this.nomeError = 'Nome é obrigatório.';
-        return false;
-      }
-      
-      if (nome.length < 3) {
-        this.nomeError = 'Nome deve ter no mínimo 3 caracteres.';
-        return false;
-      }
-      
-      this.nomeError = '';
-      return true;
-    },
-    validateTelefone() {
-      const telefone = this.signUpForm.telefone.replace(/\D/g, '');
-      
-      if (!telefone) {
-        this.telefoneError = 'Telefone é obrigatório.';
-        return false;
-      }
-      
-      if (telefone.length < 10 || telefone.length > 11) {
-        this.telefoneError = 'Telefone deve ter 10 ou 11 dígitos.';
-        return false;
-      }
-      
-      this.telefoneError = '';
-      return true;
-    },
-    validateRazaoSocial() {
-      const razaoSocial = this.signUpForm.razaoSocial.trim();
-      
-      if (!razaoSocial) {
-        this.razaoSocialError = 'Razão Social é obrigatória.';
-        return false;
-      }
-      
-      if (razaoSocial.length < 3) {
-        this.razaoSocialError = 'Razão Social deve ter no mínimo 3 caracteres.';
-        return false;
-      }
-      
-      this.razaoSocialError = '';
-      return true;
-    },
-    validateEmail() {
-      const email = this.signUpForm.email.trim();
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      
-      if (!email) {
-        this.emailError = 'E-mail é obrigatório.';
-        return false;
-      }
-      
-      if (!emailRegex.test(email)) {
-        this.emailError = 'E-mail inválido.';
-        return false;
-      }
-      
-      this.emailError = '';
-      return true;
-    },
-    validateSenha() {
-      const senha = this.signUpForm.senha;
-      
-      if (!senha) {
-        this.senhaError = 'Senha é obrigatória.';
-        return false;
-      }
-      
-      if (senha.length < 6) {
-        this.senhaError = 'Senha deve ter no mínimo 6 caracteres.';
-        return false;
-      }
-      
-      this.senhaError = '';
-      return true;
-    },
-    handleSignIn() {
-      try {
-        authService.login(this.signInForm.email, this.signInForm.senha)
-          .then(response => {
-            // API returns token in response.data.dados (lowercase)
-            const token = response.data?.dados;
-            
-            if (token) {
-              authService.setToken(token);
-              this.signInMessage = {
-                text: 'Login realizado com sucesso!',
-                type: 'success'
-              };
-              // Redirect to the originally requested page or home after 2 seconds
-              setTimeout(() => {
-                const redirectPath = sessionStorage.getItem('redirectPath');
-                sessionStorage.removeItem('redirectPath');
-                const redirectTo = redirectPath || '/';
-                this.$router.push(redirectTo);
-              }, 2000);
-            } else {
-              console.warn('No token found in response:', response.data);
-              this.signInMessage = {
-                text: 'Resposta do servidor inválida. Tente novamente.',
-                type: 'error'
-              };
-            }
-          })
-          .catch(error => {
-            console.error('Login error:', error);
-            this.signInMessage = {
-              text: error.response?.data?.mensagem || 'E-mail ou senha inválidos.',
-              type: 'error'
-            };
-          });
-      } catch (error) {
-        console.error('Error:', error);
-        this.signInMessage = {
-          text: 'Erro ao realizar login. Tente novamente.',
-          type: 'error'
-        };
-      }
-    },
-    async handleSignUp() {
-      // Validate all fields
-      if (!this.validateNome() || 
-          !this.validateDocumento() || 
-          !this.validateTelefone() || 
-          !this.validateRazaoSocial() || 
-          !this.validateEmail() || 
-          !this.validateSenha()) {
-        return;
-      }
+function validateTelefone() {
+  const telefone = signUpForm.value.telefone.replace(/\D/g, '')
+  if (!telefone) {
+    telefoneError.value = 'Telefone é obrigatório.'
+    return false
+  }
+  if (telefone.length < 10 || telefone.length > 11) {
+    telefoneError.value = 'Telefone deve ter 10 ou 11 dígitos.'
+    return false
+  }
+  telefoneError.value = ''
+  return true
+}
 
-      this.isSubmitting = true;
-      try {
-        // Map form data to RegisterModel structure
-        const signUpData = {
-          nome: this.signUpForm.nome,
-          documento: this.signUpForm.documento.replace(/\D/g, ''),
-          telefone: this.signUpForm.telefone,
-          razaoSocial: this.signUpForm.razaoSocial,
-          nomeFantasia: this.signUpForm.nomeFantasia,
-          email: this.signUpForm.email,
-          senha: this.signUpForm.senha
-        };
+function validateRazaoSocial() {
+  const razaoSocial = signUpForm.value.razaoSocial.trim()
+  if (!razaoSocial) {
+    razaoSocialError.value = 'Razão Social é obrigatória.'
+    return false
+  }
+  if (razaoSocial.length < 3) {
+    razaoSocialError.value = 'Razão Social deve ter no mínimo 3 caracteres.'
+    return false
+  }
+  razaoSocialError.value = ''
+  return true
+}
 
-        const response = await authService.signup(signUpData);
+function validateEmail() {
+  const email = signUpForm.value.email.trim()
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!email) {
+    emailError.value = 'E-mail é obrigatório.'
+    return false
+  }
+  if (!emailRegex.test(email)) {
+    emailError.value = 'E-mail inválido.'
+    return false
+  }
+  emailError.value = ''
+  return true
+}
 
-        // Check if registration was successful
-        if (response.data?.status === true) {
-          this.signUpSuccess = true;
-          this.signUpMessage = {
-            text: 'Conta criada com sucesso! Verifique seu e-mail para ativar a conta.',
+function validateSenha() {
+  const senha = signUpForm.value.senha
+  if (!senha) {
+    senhaError.value = 'Senha é obrigatória.'
+    return false
+  }
+  if (senha.length < 6) {
+    senhaError.value = 'Senha deve ter no mínimo 6 caracteres.'
+    return false
+  }
+  senhaError.value = ''
+  return true
+}
+
+function handleSignIn() {
+  try {
+    authService.login(signInForm.value.email, signInForm.value.senha)
+      .then(response => {
+        const token = response.data?.dados
+        if (token) {
+          authService.setToken(token)
+          signInMessage.value = {
+            text: 'Login realizado com sucesso!',
             type: 'success'
-          };
+          }
+          setTimeout(() => {
+            const redirectPath = sessionStorage.getItem('redirectPath')
+            sessionStorage.removeItem('redirectPath')
+            const redirectTo = redirectPath || '/'
+            router.push(redirectTo)
+          }, 2000)
         } else {
-          this.signUpMessage = {
-            text: response.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.',
+          console.warn('No token found in response:', response.data)
+          signInMessage.value = {
+            text: 'Resposta do servidor inválida. Tente novamente.',
             type: 'error'
-          };
+          }
         }
-      } catch (error) {
-        console.error('Signup error:', error);
-        const errorMessage = error.response?.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.';
-        this.signUpMessage = {
-          text: errorMessage,
+      })
+      .catch(error => {
+        console.error('Login error:', error)
+        signInMessage.value = {
+          text: error.response?.data?.mensagem || 'E-mail ou senha inválidos.',
           type: 'error'
-        };
-      } finally {
-        this.isSubmitting = false;
-      }
-    },
-    maskPhoneNumber(event) {
-      let value = event.target.value.replace(/\D/g, '');
-      
-      if (value.length > 0) {
-        if (value.length <= 2) {
-          value = `(${value}`;
-        } else if (value.length <= 7) {
-          value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
-        } else {
-          value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7, 11)}`;
         }
-      }
-      
-      this.signUpForm.telefone = value;
-    },
-    resetSignUpForm() {
-      this.signUpForm = {
-        nome: '',
-        documento: '',
-        telefone: '',
-        razaoSocial: '',
-        nomeFantasia: '',
-        email: '',
-        senha: ''
-      };
-      // Clear all error messages
-      this.nomeError = '';
-      this.documentoError = '';
-      this.telefoneError = '';
-      this.razaoSocialError = '';
-      this.emailError = '';
-      this.senhaError = '';
+      })
+  } catch (error) {
+    console.error('Error:', error)
+    signInMessage.value = {
+      text: 'Erro ao realizar login. Tente novamente.',
+      type: 'error'
     }
   }
 }
+
+async function handleSignUp() {
+  if (!validateNome() || !validateDocumento() || !validateTelefone() || !validateRazaoSocial() || !validateEmail() || !validateSenha()) {
+    return
+  }
+  isSubmitting.value = true
+  try {
+    const signUpData = {
+      nome: signUpForm.value.nome,
+      documento: signUpForm.value.documento.replace(/\D/g, ''),
+      telefone: signUpForm.value.telefone,
+      razaoSocial: signUpForm.value.razaoSocial,
+      nomeFantasia: signUpForm.value.nomeFantasia,
+      email: signUpForm.value.email,
+      senha: signUpForm.value.senha
+    }
+    const response = await authService.signup(signUpData)
+    if (response.data?.status === true) {
+      signUpSuccess.value = true
+      signUpMessage.value = {
+        text: 'Conta criada com sucesso! Verifique seu e-mail para ativar a conta.',
+        type: 'success'
+      }
+    } else {
+      signUpMessage.value = {
+        text: response.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.',
+        type: 'error'
+      }
+    }
+  } catch (error) {
+    console.error('Signup error:', error)
+    const errorMessage = error.response?.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.'
+    signUpMessage.value = {
+      text: errorMessage,
+      type: 'error'
+    }
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+function maskPhoneNumber(event) {
+  let value = event.target.value.replace(/\D/g, '')
+  if (value.length > 0) {
+    if (value.length <= 2) {
+      value = `(${value}`
+    } else if (value.length <= 7) {
+      value = `(${value.slice(0, 2)}) ${value.slice(2)}`
+    } else {
+      value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7, 11)}`
+    }
+  }
+  signUpForm.value.telefone = value
+}
+
+function resetSignUpForm() {
+  signUpForm.value = {
+    nome: '',
+    documento: '',
+    telefone: '',
+    razaoSocial: '',
+    nomeFantasia: '',
+    email: '',
+    senha: ''
+  }
+  nomeError.value = ''
+  documentoError.value = ''
+  telefoneError.value = ''
+  razaoSocialError.value = ''
+  emailError.value = ''
+  senhaError.value = ''
+}
+
+useHead({
+  title: 'Autenticação - ibpsys',
+  meta: [
+    { name: 'description', content: 'Acesse os produtos e serviços ibpsys com segurança. Faça login ou crie sua conta.' },
+    { property: 'og:title', content: 'Autenticação - ibpsys' },
+    { property: 'og:description', content: 'Acesse os produtos e serviços ibpsys com segurança. Faça login ou crie sua conta.' }
+  ]
+})
 </script>

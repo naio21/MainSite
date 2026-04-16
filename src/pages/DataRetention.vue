@@ -19,10 +19,21 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 
 const router = useRouter()
 
 function goBack() {
   router.back()
 }
+
+useHead({
+  title: 'Política de Retenção de Dados - ibpsys',
+  meta: [
+    { name: 'description', content: 'Saiba por quanto tempo a ibpsys mantém os dados pessoais e em quais situações eles são excluídos de forma segura.' },
+    { name: 'keywords', content: 'retenção de dados, exclusão de dados, privacidade, LGPD, ibpsys' },
+    { property: 'og:title', content: 'Política de Retenção de Dados - ibpsys' },
+    { property: 'og:description', content: 'Saiba por quanto tempo a ibpsys mantém os dados pessoais e em quais situações eles são excluídos de forma segura.' }
+  ]
+})
 </script>
