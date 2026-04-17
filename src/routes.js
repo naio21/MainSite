@@ -9,6 +9,7 @@ import NotFound from './pages/404.vue'
 import Reset from './pages/Reset.vue'
 import ForgotPassword from './pages/ForgotPassword.vue'
 import Contact from './pages/Contact.vue'
+import Payment from './pages/Payment.vue'
 
 export const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -17,6 +18,12 @@ export const routes = [
   { path: '/reset', name: 'Reset', component: Reset },
   { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPassword },
   { path: '/watch-sr', name: 'WatchSR', component: WatchSR },
+  {
+    path: '/payment',
+    name: 'Payment',
+    component: Payment,
+    meta: { clientOnly: true, requiresAuth: true }
+  },
   { path: '/contact', name: 'Contact', component: Contact },
   { path: '/privacy-policy', name: 'PrivacyPolicy', component: PrivacyPolicy },
   { path: '/data-retention', name: 'DataRetention', component: DataRetention },
