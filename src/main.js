@@ -12,6 +12,7 @@ import NotFound from './pages/404.vue'
 import Reset from './pages/Reset.vue'
 import ForgotPassword from './pages/ForgotPassword.vue'
 import Contact from './pages/Contact.vue'
+import Payment from './pages/Payment.vue'
 import { authService } from './service/authService'
 import './style.css'
 
@@ -45,6 +46,12 @@ const routes = [
     path: '/watch-sr',
     name: 'WatchSR',
     component: WatchSR
+  },
+  {
+    path: '/payment',
+    name: 'Payment',
+    component: Payment,
+    meta: { clientOnly: true, requiresAuth: true }
   },
   {
     path: '/contact',

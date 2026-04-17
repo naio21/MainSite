@@ -34,3 +34,7 @@ export const createApp = ViteSSG(
     }
   }
 )
+
+export async function includedRoutes(paths) {
+  return paths.filter(path => path !== '/payment' && !path.includes(':'))
+}
