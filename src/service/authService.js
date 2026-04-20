@@ -5,6 +5,26 @@ const TOKEN_EXPIRY_KEY = 'authTokenExpiry';
 const TOKEN_EXPIRY_DAYS = 14;
 const hasStorage = () => typeof window !== 'undefined' && typeof localStorage !== 'undefined';
 
+const buildExpiryTime = () => new Date().getTime() + (TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+
+function ensureTokenExpiry() {
+  if (!hasStorage()) return null;
+
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return null;
+
+  const expiryTime = localStorage.getItem(TOKEN_EXPIRY_KEY);
+  const parsedExpiry = Number.parseInt(expiryTime ?? '', 10);
+
+  if (!expiryTime || Number.isNaN(parsedExpiry)) {
+    const newExpiryTime = buildExpiryTime();
+    localStorage.setItem(TOKEN_EXPIRY_KEY, String(newExpiryTime));
+    return newExpiryTime;
+  }
+
+  return parsedExpiry;
+}
+
 export const authService = {
   login(email, senha) {
     return apiClient.post('/api/Authentication/login', {
@@ -42,20 +62,25 @@ recover(email) {
   },
 
   setToken(token) {
-    if (!hasStorage()) return;
+    if (!hasStorage() || !token) return;
     localStorage.setItem(TOKEN_KEY, token);
-
-    const expiryTime = new Date().getTime() + (TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
-    localStorage.setItem(TOKEN_EXPIRY_KEY, expiryTime);
+    localStorage.setItem(TOKEN_EXPIRY_KEY, String(buildExpiryTime()));
   },
 
   getToken() {
     if (!hasStorage()) return null;
+
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return null;
+
+    ensureTokenExpiry();
+
     if (this.isTokenExpired()) {
       this.logout();
       return null;
     }
-    return localStorage.getItem(TOKEN_KEY);
+
+    return token;
   },
 
   isAuthenticated() {
@@ -66,33 +91,44 @@ recover(email) {
     if (!hasStorage()) {
       return true;
     }
-    const expiryTime = localStorage.getItem(TOKEN_EXPIRY_KEY);
+
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) {
+      return true;
+    }
+
+    const expiryTime = ensureTokenExpiry();
     if (!expiryTime) {
       return true;
     }
-    return new Date().getTime() > parseInt(expiryTime);
+
+    return new Date().getTime() > expiryTime;
   },
 
   getTokenExpiryTime() {
     if (!hasStorage()) {
       return null;
     }
-    const expiryTime = localStorage.getItem(TOKEN_EXPIRY_KEY);
+
+    const expiryTime = ensureTokenExpiry();
     if (!expiryTime) {
       return null;
     }
-    return new Date(parseInt(expiryTime));
+
+    return new Date(expiryTime);
   },
 
   getRemainingTime() {
     if (!hasStorage()) {
       return 0;
     }
-    const expiryTime = localStorage.getItem(TOKEN_EXPIRY_KEY);
+
+    const expiryTime = ensureTokenExpiry();
     if (!expiryTime) {
       return 0;
     }
-    const remaining = parseInt(expiryTime) - new Date().getTime();
+
+    const remaining = expiryTime - new Date().getTime();
     return Math.max(0, remaining);
   },
 

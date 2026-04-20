@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { authService } from './authService';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://www.ibpsys.com.br/watchsr';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -23,7 +23,8 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isLoginRequest = error.config?.url?.includes('/api/Authentication/login');
+    if (error.response?.status === 401 && !isLoginRequest) {
       // Token expired or invalid - only redirect if not already on the auth page
       authService.logout();
       if (window.location.pathname !== '/auth') {

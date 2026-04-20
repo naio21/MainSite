@@ -300,7 +300,8 @@ function handleSignIn() {
   try {
     authService.login(signInForm.value.email, signInForm.value.senha)
       .then(response => {
-        const token = response.data?.dados
+        const dados = response.data?.dados
+        const token = typeof dados === 'string' ? dados : (dados?.token ?? dados?.Token ?? dados?.accessToken ?? dados?.AccessToken ?? null)
         if (token) {
           authService.setToken(token)
           signInMessage.value = {

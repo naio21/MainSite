@@ -2,68 +2,122 @@
   <div class="payment-page">
     <div class="payment-container">
       <header class="payment-header">
-        <h1>Pagamento via PIX</h1>
+        <h1>{{ productName ? `Pagamento - ${productName}` : 'Pagamento via PIX' }}</h1>
         <p>
-          Escolha a modalidade desejada e substitua os espaços abaixo pelos dados oficiais da sua cobrança
-          do Nubank Empresas.
+          Escolha o plano desejado e clique no botão para abrir a página de pagamento do Nubank.
+          Após concluir o pagamento, envie o comprovante para o e-mail informado abaixo.
         </p>
       </header>
 
-      <section class="payment-grid">
+      <section class="receipt-info-card">
+        <div>
+          <h2>Envio do comprovante</h2>
+          <p class="payment-note">Após concluir o pagamento, envie o comprovante para o e-mail abaixo.</p>
+        </div>
+
+        <div class="receipt-email-section">
+          <label for="receipt-email">E-mail para envio do comprovante</label>
+          <input
+            id="receipt-email"
+            type="email"
+            :value="receiptEmail"
+            readonly
+          >
+          <a
+            v-if="receiptEmail"
+            class="email-action"
+            :href="`mailto:${receiptEmail}?subject=Comprovante de Pagamento`"
+          >
+            Enviar comprovante por e-mail
+          </a>
+        </div>
+      </section>
+
+      <p v-if="isLoading" class="status-message">Carregando informações de pagamento...</p>
+      <p v-else-if="loadError" class="status-message error">{{ loadError }}</p>
+
+      <section v-else class="payment-grid">
         <article
-          v-for="plan in plans"
-          :key="plan.name"
+          v-for="plan in normalizedPlans"
+          :key="plan.slug"
           class="payment-card"
         >
           <h2>{{ plan.name }}</h2>
           <p class="plan-description">{{ plan.description }}</p>
+          <p v-if="plan.price" class="plan-price">{{ plan.price }}</p>
 
-          <div class="qr-placeholder" aria-label="Espaço reservado para QR Code PIX">
-            <span>Adicionar QR Code PIX</span>
-          </div>
-
-          <div class="pix-copy-section">
-            <label :for="`pix-${plan.slug}`">Pix Copia e Cola</label>
-            <textarea
-              :id="`pix-${plan.slug}`"
-              rows="4"
-              readonly
-              :value="plan.pixPlaceholder"
-            ></textarea>
-          </div>
+          <a
+            v-if="plan.paymentUrl"
+            :href="plan.paymentUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="pay-button"
+          >
+            Pagar
+          </a>
+          <p v-else class="status-message">Link de pagamento indisponível no momento.</p>
         </article>
       </section>
-
-      <p class="payment-note">
-        Após preencher os códigos definitivos, esta página poderá ser compartilhada apenas com usuários autenticados.
-      </p>
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import paymentService from '../service/paymentService'
+
 defineOptions({ name: 'Payment' })
 
-const plans = [
-  {
-    name: 'Mensal',
-    slug: 'mensal',
-    description: 'Plano com renovação mensal.',
-    pixPlaceholder: 'COLE AQUI O PIX COPIA E COLA DO PLANO MENSAL'
-  },
-  {
-    name: 'Semestral',
-    slug: 'semestral',
-    description: 'Plano com renovação a cada 6 meses.',
-    pixPlaceholder: 'COLE AQUI O PIX COPIA E COLA DO PLANO SEMESTRAL'
-  },
-  {
-    name: 'Anual',
-    slug: 'anual',
-    description: 'Plano com renovação anual.',
-    pixPlaceholder: 'COLE AQUI O PIX COPIA E COLA DO PLANO ANUAL'
+const route = useRoute()
+const router = useRouter()
+
+const productName = ref('')
+const plans = ref([])
+const receiptEmail = ref('')
+const isLoading = ref(true)
+const loadError = ref('')
+
+const normalizedPlans = computed(() => {
+  return plans.value.map((plan, index) => ({
+    slug: plan.slug || plan.nome?.toLowerCase() || `plano-${index + 1}`,
+    name: plan.name || plan.nome || 'Plano',
+    description: plan.description || plan.descricao || 'Pagamento via PIX.',
+    price: plan.price || plan.valor || '',
+    paymentUrl: plan.paymentUrl || plan.linkPagamento || plan.url || ''
+  }))
+})
+
+async function loadPaymentInfo() {
+  const productId = route.query.id
+
+  if (!productId) {
+    router.replace({ name: 'NotFound' })
+    return
   }
-]
+
+  isLoading.value = true
+  loadError.value = ''
+
+  try {
+    const response = await paymentService.getPaymentInfo(productId)
+    productName.value = response.productName || ''
+    plans.value = response.plans || []
+    receiptEmail.value = response.receiptEmail || ''
+  } catch (error) {
+    if (error.response?.status === 404) {
+      router.replace({ name: 'NotFound' })
+      return
+    }
+    loadError.value = error.message || 'Erro ao carregar os dados de pagamento.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadPaymentInfo()
+})
 </script>
 
 <style scoped>
@@ -77,7 +131,7 @@ const plans = [
 }
 
 .payment-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .payment-header h1 {
@@ -88,6 +142,54 @@ const plans = [
 .payment-note,
 .plan-description {
   color: rgba(255, 255, 255, 0.75);
+}
+
+.receipt-info-card {
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(100, 108, 255, 0.25);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.receipt-email-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.receipt-email-section input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #444;
+  background: #111827;
+  color: inherit;
+  padding: 0.85rem;
+  font-family: inherit;
+}
+
+.email-action,
+.pay-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  background: #646cff;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.email-action:hover,
+.pay-button:hover {
+  background: #535bf2;
 }
 
 .payment-grid {
@@ -102,49 +204,32 @@ const plans = [
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.03);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
 }
 
 .payment-card h2 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
-.qr-placeholder {
-  min-height: 210px;
-  margin: 1rem 0;
-  border: 2px dashed rgba(100, 108, 255, 0.4);
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 1rem;
-  background: rgba(100, 108, 255, 0.05);
+.plan-price {
+  font-weight: 700;
+  font-size: 1.25rem;
   color: #9ca3ff;
-  font-weight: 600;
 }
 
-.pix-copy-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.status-message {
+  margin-top: 1rem;
 }
 
-.pix-copy-section label {
-  font-weight: 600;
+.status-message.error {
+  color: #f87171;
 }
 
-.pix-copy-section textarea {
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid #444;
-  background: #111827;
-  color: inherit;
-  padding: 0.85rem;
-  resize: vertical;
-  font-family: inherit;
-}
-
-.payment-note {
-  margin-top: 1.5rem;
+.status-message.success {
+  color: #4ade80;
 }
 
 @media (prefers-color-scheme: light) {
@@ -154,12 +239,13 @@ const plans = [
     color: #555;
   }
 
-  .payment-card {
+  .payment-card,
+  .receipt-info-card {
     background: #ffffff;
     border-color: rgba(100, 108, 255, 0.2);
   }
 
-  .pix-copy-section textarea {
+  .receipt-email-section input {
     background: #f9fafb;
     border-color: #d1d5db;
     color: #213547;
