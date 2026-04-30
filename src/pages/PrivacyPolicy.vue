@@ -6,84 +6,105 @@
       <h1 id="privacy-title">Política de Privacidade</h1>
 
       <p>
-        A sua privacidade é importante para nós. É política do ibpsys respeitar a sua privacidade em relação a
-        qualquer informação sua que possamos coletar aqui.
-      </p>
-      <p>
-        Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço.
-        Fazemo-lo por meios justos e legais, com o seu conhecimento e consentimento. Também informamos por que estamos
-        coletando e como será usado.
-      </p>
-      <p>
-        Apenas retemos as informações coletadas pelo tempo necessário para fornecer o serviço solicitado. Quando
-        armazenamos dados, protegemos dentro de meios comercialmente aceitáveis para evitar perdas e roubos, bem como
-        acesso, divulgação, cópia, uso ou modificação não autorizados.
-      </p>
-      <p>
-        Não compartilhamos informações de identificação pessoal publicamente ou com terceiros, exceto quando exigido
-        por lei. Lembre-se: a ibpsys é apenas a custodiante destes dados, o proprietário é <strong>você</strong>.
-      </p>
-      <p>
-        O nosso site pode ter links para sites externos que não são operados por nós. Esteja ciente de que não temos
-        controle sobre o conteúdo e práticas desses sites e não podemos aceitar responsabilidade por suas respectivas
-        políticas de privacidade.
-      </p>
-      <p>
-        Você é livre para recusar a nossa solicitação de informações pessoais, entendendo que talvez não possamos
-        fornecer alguns dos serviços desejados.
-      </p>
-      <p>
-        O uso continuado de nosso site será considerado como aceitação de nossas práticas em torno de privacidade e
-        informações pessoais. Se você tiver alguma dúvida sobre como lidamos com dados do usuário e informações
-        pessoais, entre em contato conosco.
+        Esta Política de Privacidade descreve como a <strong>ibpsys</strong> coleta, utiliza, armazena e compartilha
+        seus dados pessoais, em conformidade com a <strong>Lei Geral de Proteção de Dados Pessoais (LGPD – Lei nº
+        13.709/2018)</strong>.
       </p>
 
+      <h2>1. Dados Coletados</h2>
+      <p>Coletamos as seguintes categorias de dados pessoais, conforme necessário para a prestação dos nossos serviços:</p>
       <ul>
-        <li>
-          O serviço Google AdSense que usamos para veicular publicidade direcionada em páginas específicas usa um cookie
-          DoubleClick para veicular anúncios mais relevantes em toda a Web e limitar o número de vezes que um determinado 
-          anúncio é exibido.
-        </li>
-        <li>
-          Para mais informações sobre o Google AdSense, consulte as FAQs oficiais sobre privacidade do Google AdSense.
-        </li>
-        <li>
-          Utilizamos anúncios para compensar os custos de funcionamento deste site e fornecer financiamento para futuros
-          desenvolvimentos. Os cookies de publicidade comportamental usados por este site foram projetados para garantir
-          que você receba anúncios mais relevantes sempre que possível, rastreando anonimamente seus interesses e
-          apresentando conteúdos semelhantes que possam ser do seu interesse.
-        </li>
-        <li>
-          Vários parceiros anunciam em nosso nome e os cookies de rastreamento de afiliados simplesmente nos permitem
-          ver se nossos clientes acessaram o site através de um dos sites de nossos parceiros, para que possamos
-          creditá-los adequadamente e, quando aplicável, permitir que nossos parceiros afiliados ofereçam promoções
-          relacionadas à compra.
-        </li>
+        <li><strong>Dados de cadastro:</strong> nome completo, endereço de e-mail, CPF/CNPJ.</li>
+        <li><strong>Dados de clientes dos nossos produtos:</strong> nome, telefone, endereço, e-mail e CPF dos clientes cadastrados pelo usuário em nossos sistemas.</li>
+        <li><strong>Dados de uso:</strong> informações de acesso, datas de login e atividade dentro da plataforma.</li>
+        <li><strong>Dados de pagamento:</strong> não armazenamos dados de pagamento. As transações via PIX são processadas diretamente pelo Nubank.</li>
+        <li><strong>Dados de navegação:</strong> cookies e identificadores utilizados pelo Google AdSense, mediante consentimento prévio.</li>
       </ul>
 
-      <h2>Compromisso do Usuário</h2>
-      <p>
-        O usuário se compromete a fazer uso adequado dos conteúdos e da informação que o ibpsys oferece no site e,
-        com caráter enunciativo, mas não limitativo:
-      </p>
+      <h2>2. Finalidade e Base Legal</h2>
+      <table class="legal-table">
+        <thead>
+          <tr>
+            <th>Dado</th>
+            <th>Finalidade</th>
+            <th>Base Legal (LGPD Art. 7)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>E-mail, CPF/CNPJ</td>
+            <td>Criação e gestão de conta, autenticação</td>
+            <td>Execução de contrato (inc. V)</td>
+          </tr>
+          <tr>
+            <td>Dados de clientes nos produtos</td>
+            <td>Prestação do serviço contratado</td>
+            <td>Execução de contrato (inc. V)</td>
+          </tr>
+          <tr>
+            <td>Dados de uso</td>
+            <td>Segurança, prevenção de fraude, suporte</td>
+            <td>Legítimo interesse (inc. IX)</td>
+          </tr>
+          <tr>
+            <td>Cookies de publicidade</td>
+            <td>Exibição de anúncios via Google AdSense</td>
+            <td>Consentimento (inc. I)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. Compartilhamento de Dados</h2>
+      <p>Seus dados não são vendidos ou cedidos a terceiros. Compartilhamos informações apenas com:</p>
       <ul>
-        <li>a) Não se envolver em atividades que sejam ilegais ou contrárias à boa-fé e à ordem pública.</li>
-        <li>b) Não difundir propaganda ou conteúdo de natureza racista, xenofóbica, jogos de sorte ou azar, qualquer
-          tipo de pornografia ilegal, de apologia ao terrorismo ou contra os direitos humanos.
-        </li>
-        <li>c) Não causar danos aos sistemas físicos (hardwares) e lógicos (softwares) do ibpsys, de seus fornecedores
-          ou terceiros, para introduzir ou disseminar vírus informáticos ou quaisquer outros sistemas de hardware ou
-          software capazes de causar danos anteriormente mencionados.
-        </li>
+        <li><strong>Nubank:</strong> processamento de pagamentos via PIX.</li>
+        <li><strong>Google AdSense:</strong> exibição de publicidade, somente após seu consentimento. Consulte a <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Política de Privacidade do Google</a>.</li>
+        <li><strong>Autoridades públicas:</strong> quando exigido por lei ou ordem judicial.</li>
       </ul>
 
-      <h2>Mais informações</h2>
+      <h2>4. Seus Direitos (LGPD Art. 18)</h2>
+      <p>Você tem direito a, a qualquer momento:</p>
+      <ul>
+        <li>Confirmar a existência de tratamento de seus dados;</li>
+        <li>Acessar os dados que mantemos sobre você;</li>
+        <li>Corrigir dados incompletos, inexatos ou desatualizados;</li>
+        <li>Solicitar a anonimização, bloqueio ou eliminação de dados desnecessários;</li>
+        <li>Solicitar a portabilidade dos seus dados;</li>
+        <li>Revogar o consentimento dado para cookies de publicidade;</li>
+        <li>Solicitar a exclusão completa da sua conta e dados associados (veja nossa <router-link to="/data-retention">Política de Retenção de Dados</router-link>).</li>
+      </ul>
       <p>
-        Esperamos que esteja esclarecido e, como mencionado anteriormente, se houver algo que você não tem certeza se
-        precisa ou não, geralmente é mais seguro deixar os cookies ativados, caso interaja com um dos recursos que
-        você usa em nosso site.
+        Para exercer qualquer um desses direitos, fale conosco através do nosso
+        <router-link to="/contact">Formulário de Contato</router-link>.
       </p>
-      <p class="effective-date">Esta política é efetiva a partir de sua data de publicação, em 13 de abril de 2026.</p>
+
+      <h2>5. Cookies</h2>
+      <p>Utilizamos dois tipos de cookies:</p>
+      <ul>
+        <li><strong>Cookies essenciais:</strong> necessários para autenticação e funcionamento da plataforma. Não requerem consentimento.</li>
+        <li><strong>Cookies de publicidade (Google AdSense):</strong> utilizados para exibir anúncios relevantes. Serão ativados somente após seu consentimento explícito, concedido através do aviso de cookies exibido ao acessar o site.</li>
+      </ul>
+
+      <h2>6. Retenção de Dados</h2>
+      <p>Os prazos de retenção de dados estão detalhados em nossa <router-link to="/data-retention">Política de Retenção de Dados</router-link>.</p>
+
+      <h2>7. Segurança</h2>
+      <p>
+        Adotamos medidas técnicas e organizacionais para proteger seus dados contra acesso não autorizado, perda ou
+        divulgação, incluindo autenticação com token e comunicação criptografada via HTTPS.
+      </p>
+
+      <h2>8. Contato e Encarregado de Dados (DPO)</h2>
+      <p>
+        Para dúvidas, solicitações ou reclamações relacionadas ao tratamento de dados pessoais, fale conosco através
+        do nosso <router-link to="/contact">Formulário de Contato</router-link>.
+      </p>
+      <p>
+        Você também pode registrar reclamações perante a <strong>Autoridade Nacional de Proteção de Dados (ANPD)</strong>:
+        <a href="https://www.gov.br/anpd" target="_blank" rel="noopener noreferrer">www.gov.br/anpd</a>.
+      </p>
+
+      <p class="effective-date">Esta política é efetiva a partir de 13 de abril de 2026 e pode ser atualizada periodicamente. Alterações relevantes serão comunicadas pelo site.</p>
     </article>
   </section>
 </template>
@@ -173,5 +194,28 @@ useHead({
   margin-top: 1.4rem;
   font-size: 0.92rem;
   color: #6b7280;
+}
+
+.legal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.2rem;
+  font-size: 0.92rem;
+}
+
+.legal-table th,
+.legal-table td {
+  border: 1px solid #d1d5db;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal-table thead tr {
+  background-color: #f3f4f6;
+}
+
+.legal-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
 }
 </style>

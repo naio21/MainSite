@@ -33,7 +33,10 @@
             <li>.NET 8 Runtime (você terá a opção de instalar durante o setup)</li>
             <li>Conexão com a internet para atualizações e sincronização de dados</li>
         </ul>
-        <a v-if="isAuthenticated" href="/downloads/setup.exe" class="download-button">Baixar Agora</a>
+        <div v-if="isAuthenticated" class="action-buttons">
+          <a href="/downloads/setup.exe" class="download-button">Baixar Agora</a>
+          <router-link to="/Payment?id=1" class="download-button renew-button">Renovar Assinatura</router-link>
+        </div>
         <p v-else class="auth-required-notice">
           Para baixar o instalador, você precisa se cadastrar ou se autenticar.
           <router-link to="/auth">Faça login ou crie uma conta</router-link> para continuar.
@@ -47,26 +50,57 @@
              data-ad-slot="6773427561"
              data-ad-format="auto"
              data-full-width-responsive="true">
-             <div class="ad-fallback" style="text-align: center; color: #999; padding: 20px; border: 1px dashed #ccc;">
-                <small>Espaço destinado a parceiros e fornituras.</small>
-             </div>
         </ins>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { authService } from '../service/authService'
 import { useHead } from '@unhead/vue'
 
 const isAuthenticated = ref(authService.isAuthenticated())
 
-onMounted(() => {
+const ADSENSE_CLIENT = 'ca-pub-4013551925638100'
+const STORAGE_KEY = 'cookie_consent_dismissed'
+
+function pushAd(personalized) {
     try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        ;(window.adsbygoogle = window.adsbygoogle || []).push(
+            personalized ? {} : { params: { google_npa: 1 } }
+        )
     } catch (e) {
-        console.error("AdSense error:", e);
+        console.error('AdSense error:', e)
     }
+}
+
+function initAdSense(personalized) {
+    if (document.querySelector(`script[src*="${ADSENSE_CLIENT}"]`)) {
+        pushAd(personalized)
+        return
+    }
+    const script = document.createElement('script')
+    script.async = true
+    script.crossOrigin = 'anonymous'
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`
+    script.onload = () => pushAd(personalized)
+    document.head.appendChild(script)
+}
+
+function onConsentGranted() {
+    pushAd(true)
+}
+
+onMounted(() => {
+    const hasConsent = localStorage.getItem(STORAGE_KEY) === 'true'
+    initAdSense(hasConsent)
+    if (!hasConsent) {
+        window.addEventListener('cookie-consent-granted', onConsentGranted, { once: true })
+    }
+})
+
+onUnmounted(() => {
+    window.removeEventListener('cookie-consent-granted', onConsentGranted)
 })
 
 useHead({
@@ -103,6 +137,21 @@ h2, h3, h4, p {
 
 .auth-required-notice a:hover {
   text-decoration: underline;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.renew-button {
+  background-color: #f59e0b;
+}
+
+.renew-button:hover {
+  background-color: #d97706;
 }
 
 .adsbygoogle {

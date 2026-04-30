@@ -2,36 +2,11 @@
   <div class="payment-page">
     <div class="payment-container">
       <header class="payment-header">
-        <h1>{{ productName ? `Pagamento - ${productName}` : 'Pagamento via PIX' }}</h1>
+        <h1>{{ productName ? `Renovação - ${productName}` : 'Pagamento via PIX' }}</h1>
         <p>
-          Escolha o plano desejado e clique no botão para abrir a página de pagamento do Nubank.
-          Após concluir o pagamento, envie o comprovante para o e-mail informado abaixo.
+          Escolha o plano desejado e clique no botão para abrir a página de pagamento via PIX do Nubank.
         </p>
       </header>
-
-      <section class="receipt-info-card">
-        <div>
-          <h2>Envio do comprovante</h2>
-          <p class="payment-note">Após concluir o pagamento, envie o comprovante para o e-mail abaixo.</p>
-        </div>
-
-        <div class="receipt-email-section">
-          <label for="receipt-email">E-mail para envio do comprovante</label>
-          <input
-            id="receipt-email"
-            type="email"
-            :value="receiptEmail"
-            readonly
-          >
-          <a
-            v-if="receiptEmail"
-            class="email-action"
-            :href="`mailto:${receiptEmail}?subject=Comprovante de Pagamento`"
-          >
-            Enviar comprovante por e-mail
-          </a>
-        </div>
-      </section>
 
       <p v-if="isLoading" class="status-message">Carregando informações de pagamento...</p>
       <p v-else-if="loadError" class="status-message error">{{ loadError }}</p>
@@ -57,6 +32,22 @@
           </a>
           <p v-else class="status-message">Link de pagamento indisponível no momento.</p>
         </article>
+      </section>
+      <br />
+      <section class="receipt-info-card">
+        <div>
+          <h2>Importante!</h2>
+          <p class="payment-note">
+            Como a cobrança via PIX é terceirizada pela instituição financeira, o processo de reconhecimento do pagamento e renovação da assinatura é manual.<br/>
+            Para poder identificar o pagador e renovar a data de vencimento o mais rápido possível, solicitamos que envie o comprovante para 
+          <a
+            v-if="receiptEmail"
+            :href="`mailto:${receiptEmail}?subject=Comprovante de Pagamento`"
+          >
+            {{receiptEmail}}
+          </a>, informando também seu documento cadastrado (CPF/CNPJ) ou o e-mail utilizado para login.
+          </p>
+        </div>
       </section>
     </div>
   </div>
@@ -103,7 +94,7 @@ async function loadPaymentInfo() {
     const response = await paymentService.getPaymentInfo(productId)
     productName.value = response.productName || ''
     plans.value = response.plans || []
-    receiptEmail.value = response.receiptEmail || ''
+    receiptEmail.value = response.receiptEmail || 'ibpsys@ibpsys.com.br'
   } catch (error) {
     if (error.response?.status === 404) {
       router.replace({ name: 'NotFound' })
@@ -150,46 +141,7 @@ onMounted(() => {
   border: 1px solid rgba(100, 108, 255, 0.25);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.03);
-}
-
-.receipt-email-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-top: 1rem;
-}
-
-.receipt-email-section input {
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid #444;
-  background: #111827;
-  color: inherit;
-  padding: 0.85rem;
-  font-family: inherit;
-}
-
-.email-action,
-.pay-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: fit-content;
-  border: none;
-  border-radius: 8px;
-  padding: 0.65rem 1.4rem;
-  background: #646cff;
-  color: #fff;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: background-color 0.2s;
-}
-
-.email-action:hover,
-.pay-button:hover {
-  background: #535bf2;
+  text-align: justify;
 }
 
 .payment-grid {
@@ -208,6 +160,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.75rem;
+  text-align: justify;
 }
 
 .payment-card h2 {
@@ -224,12 +177,28 @@ onMounted(() => {
   margin-top: 1rem;
 }
 
-.status-message.error {
-  color: #f87171;
+.pay-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  background: #646cff;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
 }
 
-.status-message.success {
-  color: #4ade80;
+.pay-button:hover {
+  background: #535bf2;
+}
+
+.status-message.error {
+  color: #f87171;
 }
 
 @media (prefers-color-scheme: light) {
@@ -243,12 +212,6 @@ onMounted(() => {
   .receipt-info-card {
     background: #ffffff;
     border-color: rgba(100, 108, 255, 0.2);
-  }
-
-  .receipt-email-section input {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    color: #213547;
   }
 }
 </style>

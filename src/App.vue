@@ -29,17 +29,20 @@
     </nav>
     <router-view></router-view>
     <Footer></Footer>
+    <CookieBanner></CookieBanner>
   </div>
 </template>
 
 <script>
 import { authService } from './service/authService';
 import Footer from './components/Footer.vue';
+import CookieBanner from './components/CookieBanner.vue';
 
 export default {
   name: 'App',
   components: {
-    Footer
+    Footer,
+    CookieBanner
   },
   data() {
     return {
