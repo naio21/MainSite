@@ -31,7 +31,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import apiClient from '../service/api'
@@ -43,8 +43,8 @@ const loading = ref(true)
 const success = ref(false)
 const error = ref(false)
 const errorMessage = ref('Ocorreu um erro ao ativar sua conta. Por favor, tente novamente mais tarde.')
-const errorDetails = ref(null)
-const activationId = ref(null)
+const errorDetails = ref<string | null>(null)
+const activationId = ref<string | string[] | null>(null)
 
 const route = useRoute()
 const router = useRouter()
@@ -70,7 +70,7 @@ async function processActivation() {
     // Success
     loading.value = false
     success.value = true
-  } catch (err) {
+  } catch (err: any) {
     loading.value = false
     error.value = true
 

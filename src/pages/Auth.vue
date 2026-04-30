@@ -160,7 +160,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { isCNPJ, isCPF } from 'validation-br'
@@ -192,8 +192,8 @@ const emailError = ref('')
 const senhaError = ref('')
 const documentoError = ref('')
 
-function maskDocumento(event) {
-  let value = event.target.value.replace(/\D/g, '')
+function maskDocumento(event: Event) {
+  let value = (event.target as HTMLInputElement).value.replace(/\D/g, '')
   let masked = ''
   if (value.length === 11) {
     masked = value.slice(0, 3) + '.' + value.slice(3, 6) + '.' + value.slice(6, 9) + '-' + value.slice(9)
@@ -297,45 +297,37 @@ function validateSenha() {
 }
 
 function handleSignIn() {
-  try {
-    authService.login(signInForm.value.email, signInForm.value.senha)
-      .then(response => {
-        const dados = response.data?.dados
-        const token = typeof dados === 'string' ? dados : (dados?.token ?? dados?.Token ?? dados?.accessToken ?? dados?.AccessToken ?? null)
-        if (token) {
-          authService.setToken(token)
-          signInMessage.value = {
-            text: 'Login realizado com sucesso!',
-            type: 'success'
-          }
-          setTimeout(() => {
-            const redirectPath = sessionStorage.getItem('redirectPath')
-            sessionStorage.removeItem('redirectPath')
-            const redirectTo = redirectPath || '/'
-            router.push(redirectTo)
-          }, 2000)
-        } else {
-          console.warn('No token found in response:', response.data)
-          signInMessage.value = {
-            text: 'Resposta do servidor inválida. Tente novamente.',
-            type: 'error'
-          }
-        }
-      })
-      .catch(error => {
-        console.error('Login error:', error)
+  authService.login(signInForm.value.email, signInForm.value.senha)
+    .then(response => {
+      const dados = response.data?.dados
+      const token = typeof dados === 'string' ? dados : (dados?.token ?? dados?.Token ?? dados?.accessToken ?? dados?.AccessToken ?? null)
+      if (token) {
+        authService.setToken(token)
         signInMessage.value = {
-          text: error.response?.data?.mensagem || 'E-mail ou senha inválidos.',
+          text: 'Login realizado com sucesso!',
+          type: 'success'
+        }
+        setTimeout(() => {
+          const redirectPath = sessionStorage.getItem('redirectPath')
+          sessionStorage.removeItem('redirectPath')
+          const redirectTo = redirectPath || '/'
+          router.push(redirectTo)
+        }, 2000)
+      } else {
+        console.warn('No token found in response:', response.data)
+        signInMessage.value = {
+          text: 'Resposta do servidor inválida. Tente novamente.',
           type: 'error'
         }
-      })
-  } catch (error) {
-    console.error('Error:', error)
-    signInMessage.value = {
-      text: 'Erro ao realizar login. Tente novamente.',
-      type: 'error'
-    }
-  }
+      }
+    })
+    .catch((error: any) => {
+      console.error('Login error:', error)
+      signInMessage.value = {
+        text: error.response?.data?.mensagem || 'E-mail ou senha inválidos.',
+        type: 'error'
+      }
+    })
 }
 
 async function handleSignUp() {
@@ -366,7 +358,7 @@ async function handleSignUp() {
         type: 'error'
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Signup error:', error)
     const errorMessage = error.response?.data?.mensagem || 'Erro ao criar a conta. Por favor, tente novamente.'
     signUpMessage.value = {
@@ -378,8 +370,8 @@ async function handleSignUp() {
   }
 }
 
-function maskPhoneNumber(event) {
-  let value = event.target.value.replace(/\D/g, '')
+function maskPhoneNumber(event: Event) {
+  let value = (event.target as HTMLInputElement).value.replace(/\D/g, '')
   if (value.length > 0) {
     if (value.length <= 2) {
       value = `(${value}`

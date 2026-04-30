@@ -13,3 +13,9 @@ declare module 'vue-router' {
     clientOnly?: boolean
   }
 }
+
+declare global {
+  interface Window {
+    adsbygoogle?: unknown[]
+  }
+}
