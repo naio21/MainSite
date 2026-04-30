@@ -33,92 +33,86 @@
   </div>
 </template>
 
-<script>
-import { authService } from './service/authService';
-import Footer from './components/Footer.vue';
-import CookieBanner from './components/CookieBanner.vue';
+<script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+import { authService } from './service/authService'
+import Footer from './components/Footer.vue'
+import CookieBanner from './components/CookieBanner.vue'
 
-export default {
-  name: 'App',
-  components: {
-    Footer,
-    CookieBanner
-  },
-  data() {
-    return {
-      isAuthenticated: false,
-      showExpiryWarning: false,
-      expiryTimeFormatted: '',
-      expiryCheckInterval: null
-    };
-  },
-  mounted() {
-    this.checkAuthentication();
-    this.checkTokenExpiry();
-    
-    // Check every minute for token expiry
-    this.expiryCheckInterval = setInterval(() => {
-      this.checkTokenExpiry();
-    }, 60000);
-    
-    // Check authentication status whenever route changes
-    this.$router.afterEach(() => {
-      this.checkAuthentication();
-    });
-  },
-  beforeUnmount() {
-    if (this.expiryCheckInterval) {
-      clearInterval(this.expiryCheckInterval);
-    }
-  },
-  methods: {
-    checkAuthentication() {
-      this.isAuthenticated = authService.isAuthenticated();
-    },
-    checkTokenExpiry() {
-      if (!this.isAuthenticated) {
-        this.showExpiryWarning = false;
-        return;
-      }
+defineOptions({ name: 'App' })
 
-      // Check if token is expiring soon (within 24 hours)
-      if (authService.isTokenExpiringSoon(24)) {
-        this.showExpiryWarning = true;
-        this.formatExpiryTime();
-      } else {
-        this.showExpiryWarning = false;
-      }
-    },
-    formatExpiryTime() {
-      const expiryTime = authService.getTokenExpiryTime();
-      if (!expiryTime) {
-        this.expiryTimeFormatted = '';
-        return;
-      }
+const router = useRouter()
+const isAuthenticated = ref(false)
+const showExpiryWarning = ref(false)
+const expiryTimeFormatted = ref('')
+let expiryCheckInterval: ReturnType<typeof setInterval> | null = null
 
-      const now = new Date();
-      const diffMs = expiryTime - now;
-      
-      if (diffMs < 0) {
-        this.expiryTimeFormatted = 'agora';
-        return;
-      }
+function checkAuthentication(): void {
+  isAuthenticated.value = authService.isAuthenticated()
+}
 
-      const hours = Math.floor(diffMs / (1000 * 60 * 60));
-      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+function formatExpiryTime(): void {
+  const expiryTime = authService.getTokenExpiryTime()
+  if (!expiryTime) {
+    expiryTimeFormatted.value = ''
+    return
+  }
 
-      if (hours > 0) {
-        this.expiryTimeFormatted = `em ${hours}h ${minutes}min`;
-      } else {
-        this.expiryTimeFormatted = `em ${minutes} minutos`;
-      }
-    },
-    handleLogout() {
-      authService.logout();
-      this.isAuthenticated = false;
-      this.showExpiryWarning = false;
-      this.$router.push('/');
-    }
+  const diffMs = expiryTime.getTime() - new Date().getTime()
+
+  if (diffMs < 0) {
+    expiryTimeFormatted.value = 'agora'
+    return
+  }
+
+  const hours = Math.floor(diffMs / (1000 * 60 * 60))
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+  if (hours > 0) {
+    expiryTimeFormatted.value = `em ${hours}h ${minutes}min`
+  } else {
+    expiryTimeFormatted.value = `em ${minutes} minutos`
   }
 }
+
+function checkTokenExpiry(): void {
+  if (!isAuthenticated.value) {
+    showExpiryWarning.value = false
+    return
+  }
+
+  if (authService.isTokenExpiringSoon(24)) {
+    showExpiryWarning.value = true
+    formatExpiryTime()
+  } else {
+    showExpiryWarning.value = false
+  }
+}
+
+function handleLogout(): void {
+  authService.logout()
+  isAuthenticated.value = false
+  showExpiryWarning.value = false
+  router.push('/')
+}
+
+onMounted(() => {
+  checkAuthentication()
+  checkTokenExpiry()
+
+  expiryCheckInterval = setInterval(() => {
+    checkTokenExpiry()
+  }, 60000)
+
+  router.afterEach(() => {
+    checkAuthentication()
+  })
+})
+
+onBeforeUnmount(() => {
+  if (expiryCheckInterval) {
+    clearInterval(expiryCheckInterval)
+  }
+})
 </script>

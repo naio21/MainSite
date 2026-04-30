@@ -1,14 +1,8 @@
 <template>
   <div class="reset-page">
     <div class="reset-container">
-      <!-- Loading State -->
-      <div v-if="loading" class="reset-content">
-        <h2>Aguarde...</h2>
-        <div class="spinner"></div>
-      </div>
-
       <!-- Success State -->
-      <div v-else-if="success" class="reset-content success">
+      <div v-if="success" class="reset-content success">
         <div class="success-icon">✓</div>
         <h2>Senha Redefinida!</h2>
         <p>Sua senha foi alterada com sucesso.</p>
@@ -55,101 +49,93 @@
   </div>
 </template>
 
-<script>
-import { useHead } from '@unhead/vue';
-import apiClient from '../service/api';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
+import apiClient from '../service/api'
 
-export default {
-  name: 'Reset',
-  setup() {
-    useHead({
-      title: 'Redefinir Senha - ibpsys',
-      meta: [
-        { name: 'description', content: 'Defina uma nova senha para recuperar o acesso à sua conta ibpsys com segurança.' },
-        { name: 'keywords', content: 'redefinir senha, recuperação de conta, ibpsys, segurança, autenticação' },
-        { property: 'og:title', content: 'Redefinir Senha - ibpsys' },
-        { property: 'og:description', content: 'Defina uma nova senha para recuperar o acesso à sua conta ibpsys com segurança.' }
-      ]
-    });
-  },
-  data() {
-    return {
-      loading: false,
-      success: false,
-      submitting: false,
-      encryptedId: null,
-      form: {
-        newPassword: '',
-        confirmPassword: ''
-      },
-      errors: {
-        newPassword: '',
-        confirmPassword: ''
-      },
-      message: {
-        text: '',
-        type: ''
-      }
-    };
-  },
-  mounted() {
-    this.encryptedId = this.$route.query.id;
-    if (!this.encryptedId) {
-      this.$router.replace('/404');
-    }
-  },
-  methods: {
-    validateNewPassword() {
-      if (!this.form.newPassword) {
-        this.errors.newPassword = 'A nova senha é obrigatória.';
-        return false;
-      }
-      if (this.form.newPassword.length < 6) {
-        this.errors.newPassword = 'A senha deve ter no mínimo 6 caracteres.';
-        return false;
-      }
-      this.errors.newPassword = '';
-      return true;
-    },
-    validateConfirmPassword() {
-      if (!this.form.confirmPassword) {
-        this.errors.confirmPassword = 'Por favor, confirme a nova senha.';
-        return false;
-      }
-      if (this.form.newPassword !== this.form.confirmPassword) {
-        this.errors.confirmPassword = 'As senhas não coincidem.';
-        return false;
-      }
-      this.errors.confirmPassword = '';
-      return true;
-    },
-    async handleReset() {
-      if (!this.validateNewPassword() | !this.validateConfirmPassword()) {
-        return;
-      }
+defineOptions({ name: 'Reset' })
 
-      this.submitting = true;
-      this.message = { text: '', type: '' };
+const route = useRoute()
+const router = useRouter()
 
-      try {
-        await apiClient.post('/api/Authentication/reset', {
-          EncryptedId: this.encryptedId,
-          NewPassword: this.form.newPassword
-        });
+const success = ref(false)
+const submitting = ref(false)
+const encryptedId = ref<string | null>(null)
+const form = ref({ newPassword: '', confirmPassword: '' })
+const errors = ref({ newPassword: '', confirmPassword: '' })
+const message = ref({ text: '', type: '' })
 
-        this.success = true;
-      } catch (err) {
-        this.message = {
-          text: err.response?.data?.mensagem || 'Erro ao redefinir a senha. Tente novamente.',
-          type: 'error'
-        };
-        console.error('Reset error:', err);
-      } finally {
-        this.submitting = false;
-      }
-    }
+onMounted(() => {
+  const id = route.query.id
+  encryptedId.value = typeof id === 'string' ? id : null
+  if (!encryptedId.value) {
+    router.replace('/404')
   }
-};
+})
+
+function validateNewPassword(): boolean {
+  if (!form.value.newPassword) {
+    errors.value.newPassword = 'A nova senha é obrigatória.'
+    return false
+  }
+  if (form.value.newPassword.length < 6) {
+    errors.value.newPassword = 'A senha deve ter no mínimo 6 caracteres.'
+    return false
+  }
+  errors.value.newPassword = ''
+  return true
+}
+
+function validateConfirmPassword(): boolean {
+  if (!form.value.confirmPassword) {
+    errors.value.confirmPassword = 'Por favor, confirme a nova senha.'
+    return false
+  }
+  if (form.value.newPassword !== form.value.confirmPassword) {
+    errors.value.confirmPassword = 'As senhas não coincidem.'
+    return false
+  }
+  errors.value.confirmPassword = ''
+  return true
+}
+
+async function handleReset(): Promise<void> {
+  // Run both validators so all errors show at once
+  const p1 = validateNewPassword()
+  const p2 = validateConfirmPassword()
+  if (!p1 || !p2) return
+
+  submitting.value = true
+  message.value = { text: '', type: '' }
+
+  try {
+    await apiClient.post('/api/Authentication/reset', {
+      EncryptedId: encryptedId.value,
+      NewPassword: form.value.newPassword
+    })
+    success.value = true
+  } catch (err: any) {
+    message.value = {
+      text: err.response?.data?.mensagem || 'Erro ao redefinir a senha. Tente novamente.',
+      type: 'error'
+    }
+    console.error('Reset error:', err)
+  } finally {
+    submitting.value = false
+  }
+}
+
+useHead({
+  title: 'Redefinir Senha - ibpsys',
+  meta: [
+    { name: 'description', content: 'Defina uma nova senha para recuperar o acesso à sua conta ibpsys com segurança.' },
+    { name: 'keywords', content: 'redefinir senha, recuperação de conta, ibpsys, segurança, autenticação' },
+    { property: 'og:title', content: 'Redefinir Senha - ibpsys' },
+    { property: 'og:description', content: 'Defina uma nova senha para recuperar o acesso à sua conta ibpsys com segurança.' }
+  ]
+})
 </script>
 
 <style scoped>

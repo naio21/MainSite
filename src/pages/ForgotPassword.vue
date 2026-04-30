@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useHead } from '@unhead/vue'
 import { authService } from '../service/authService'
@@ -62,7 +62,7 @@ function handleForgotPassword() {
         }
       }
     })
-    .catch(error => {
+    .catch((error: any) => {
       console.error('Forgot Password error:', error)
       message.value = {
         text: error.response?.data?.mensagem || 'Erro ao enviar e-mail de recuperação. Tente novamente.',

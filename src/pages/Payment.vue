@@ -53,7 +53,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import paymentService from '../service/paymentService'
@@ -80,7 +80,8 @@ const normalizedPlans = computed(() => {
 })
 
 async function loadPaymentInfo() {
-  const productId = route.query.id
+  const rawId = route.query.id
+  const productId = Array.isArray(rawId) ? rawId[0] : rawId
 
   if (!productId) {
     router.replace({ name: 'NotFound' })
@@ -95,7 +96,7 @@ async function loadPaymentInfo() {
     productName.value = response.productName || ''
     plans.value = response.plans || []
     receiptEmail.value = response.receiptEmail || 'ibpsys@ibpsys.com.br'
-  } catch (error) {
+  } catch (error: any) {
     if (error.response?.status === 404) {
       router.replace({ name: 'NotFound' })
       return

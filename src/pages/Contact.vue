@@ -52,7 +52,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import apiClient from '../service/api'
 import { useHead } from '@unhead/vue'
@@ -77,7 +77,7 @@ async function handleSubmit() {
       type: 'success'
     }
     form.value = { email: '', subject: '', message: '' }
-  } catch (error) {
+  } catch (error: any) {
     const status = error.response?.status
     if (status === 429) {
       message.value = {

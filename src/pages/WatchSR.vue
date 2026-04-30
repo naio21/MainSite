@@ -54,7 +54,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { authService } from '../service/authService'
 import { useHead } from '@unhead/vue'

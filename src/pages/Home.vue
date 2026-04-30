@@ -49,8 +49,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
+
+defineOptions({ name: 'Home' })
+
+function calculateYearsFromMay1996(): number {
+  const startDate = new Date(1996, 4, 1)
+  const now = new Date()
+  const totalMonths =
+    (now.getFullYear() - startDate.getFullYear()) * 12 +
+    (now.getMonth() - startDate.getMonth())
+  return Math.max(0, Math.floor(totalMonths / 12))
+}
+
+const yearsSinceMay1996 = computed(() => calculateYearsFromMay1996())
+
 useHead({
   title: 'Home - ibpsys',
   meta: [
@@ -60,25 +75,6 @@ useHead({
     { name: 'keywords', content: 'ibpsys, soluções, sistemas para relojoeiros, negócios, tecnologia, Microsoft .NET, Vue.js' }
   ]
 })
-</script>
-
-<script>
-function calculateYearsFromMay1996() {
-  const startDate = new Date(1996, 4, 1)
-  const now = new Date()
-
-  const totalMonths = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth())
-  return Math.max(0, Math.floor(totalMonths / 12))
-}
-
-export default {
-  name: 'Home',
-  computed: {
-    yearsSinceMay1996() {
-      return calculateYearsFromMay1996()
-    }
-  }
-}
 </script>
 
 <style scoped>
