@@ -1,6 +1,6 @@
 import { ViteSSG } from 'vite-ssg'
 import App from './App.vue'
-import { routes } from './routes.js'
+import { routes } from './routes'
 import { authService } from './service/authService'
 import './style.css'
 
@@ -25,7 +25,7 @@ export const createApp = ViteSSG(
     if (isClient) {
       router.beforeEach((to) => {
         const isAuthenticated = !!authService.getToken()
-        const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+        const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
         if (requiresAuth && !isAuthenticated) {
           sessionStorage.setItem('redirectPath', to.fullPath)
           return { name: 'Auth' }
@@ -35,6 +35,6 @@ export const createApp = ViteSSG(
   }
 )
 
-export async function includedRoutes(paths) {
-  return paths.filter(path => path !== '/payment' && !path.includes(':'))
+export async function includedRoutes(paths: string[]): Promise<string[]> {
+  return paths.filter((path) => path !== '/payment' && !path.includes(':'))
 }

@@ -1,3 +1,4 @@
+import type { RouteRecordRaw } from 'vue-router'
 import Home from './pages/Home.vue'
 import Auth from './pages/Auth.vue'
 import Activate from './pages/Activate.vue'
@@ -11,7 +12,7 @@ import ForgotPassword from './pages/ForgotPassword.vue'
 import Contact from './pages/Contact.vue'
 import Payment from './pages/Payment.vue'
 
-export const routes = [
+export const routes: RouteRecordRaw[] = [
   { path: '/', name: 'Home', component: Home },
   { path: '/auth', name: 'Auth', component: Auth },
   { path: '/activate', name: 'Activate', component: Activate },
@@ -28,13 +29,6 @@ export const routes = [
   { path: '/privacy-policy', name: 'PrivacyPolicy', component: PrivacyPolicy },
   { path: '/data-retention', name: 'DataRetention', component: DataRetention },
   { path: '/subscribing-policy', name: 'SubscribingPolicy', component: SubscribingPolicy },
-  // Example: Future private/user-specific route (SPA-only, not SSG)
-  // {
-  //   path: '/dashboard',
-  //   name: 'Dashboard',
-  //   component: () => import('./pages/Dashboard.vue'),
-  //   meta: { clientOnly: true, requiresAuth: true }
-  // },
   { path: '/404', name: 'NotFound', component: NotFound },
   { path: '/:pathMatch(.*)*', redirect: '/404' }
 ]
